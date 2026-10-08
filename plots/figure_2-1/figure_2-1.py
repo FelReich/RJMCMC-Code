@@ -1,7 +1,6 @@
 """Plot coal-mining disaster days and their cumulative counting process.
 
-All event days are read from Code/data/coal_disasters.csv. Replacing that file
-with a documented 192-event source will update the plot without code changes.
+All event days are read from Code/data/coal_disasters.csv.
 """
 
 from pathlib import Path
