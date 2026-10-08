@@ -34,7 +34,7 @@ def main() -> None:
 
     ax_count.step(count_x, count_y, where="post", color="black",
                   linestyle=":", linewidth=1.5)
-    ax_count.set_ylabel("Cumulative number of disasters")
+    ax_count.set_ylabel("Cumulative counts")
     ax_count.set_ylim(0, max(200, len(days) + 5))
     ax_count.grid(axis="y", color="0.88", linewidth=0.6)
 
@@ -46,7 +46,7 @@ def main() -> None:
     ax_events.set_ylim(-0.55, 0.55)
     ax_events.set_yticks([])
     ax_events.set_ylabel("Disasters")
-    ax_events.set_xlabel("Days since 1 January 1851")
+    ax_events.set_xlabel("Time (days)")
 
     for ax in (ax_count, ax_events):
         ax.set_xlim(START_DAY, END_DAY)
