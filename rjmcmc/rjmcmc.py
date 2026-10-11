@@ -5,7 +5,7 @@ import numpy as np
 
 @dataclass
 class Proposal:
-    """A proposed state, its reverse move, and any sampled auxiliary values."""
+    """A proposed state, its reverse move, and move-specific auxiliary values."""
 
     state: object
     reverse_move: str
@@ -55,6 +55,8 @@ class BaseRJMCMC:
         self.moves = moves
         self.move_weights = move_weights
         self.rng = np.random.default_rng(seed)
+        self.states = None
+        self.move_outcomes = None
 
     def move_probabilities(self, state):
         """Normalize weights over moves available at this state."""
@@ -111,6 +113,8 @@ class BaseRJMCMC:
 
     def run(self, initial_state, n_steps):
         """Run the chain and record states and move outcomes."""
+        if not isinstance(n_steps, (int, np.integer)) or n_steps < 0:
+            raise ValueError("n_steps must be a non-negative integer")
         state = initial_state
         states = [state]
         moves = []
@@ -120,4 +124,126 @@ class BaseRJMCMC:
             states.append(state)
             moves.append((name, accepted))
 
+        self.states = states
+        self.move_outcomes = moves
         return states, moves
+
+    def _check_burn_in(self, burn_in):
+        if self.move_outcomes is None:
+            raise RuntimeError("Run the chain before evaluating it")
+        if (
+            not isinstance(burn_in, (int, np.integer))
+            or burn_in < 0
+            or burn_in >= len(self.move_outcomes)
+        ):
+            raise ValueError("burn_in must leave at least one sampled step")
+
+    def _trace_values(self, statistic=None):
+        if self.states is None:
+            raise RuntimeError("Run the chain before evaluating it")
+        if statistic is None:
+            if all(hasattr(state, "k") for state in self.states):
+                values = [state.k for state in self.states]
+            elif all(np.isscalar(state) for state in self.states):
+                values = self.states
+            else:
+                raise ValueError("Provide a scalar statistic(state) for these states")
+        else:
+            values = [statistic(state) for state in self.states]
+        values = np.asarray(values, dtype=float)
+        if values.ndim != 1 or not np.all(np.isfinite(values)):
+            raise ValueError(
+                "The trace statistic must be a finite scalar for each state"
+            )
+        return values
+
+    def trace_plot(self, statistic=None, burn_in=0, save_path=None, label=None):
+        """Return a trace figure, using model index k unless given a statistic."""
+        self._check_burn_in(burn_in)
+        values = self._trace_values(statistic)
+
+        import matplotlib.pyplot as plt
+
+        figure, axis = plt.subplots(figsize=(9, 3.5))
+        axis.plot(np.arange(len(values)), values, linewidth=0.7)
+        if burn_in:
+            axis.axvline(burn_in, color="tab:red", linestyle="--", label="Burn-in")
+            axis.legend()
+        default_label = (
+            "Model index k"
+            if statistic is None and hasattr(self.states[0], "k")
+            else "Statistic"
+        )
+        axis.set(xlabel="Iteration", ylabel=label or default_label)
+        figure.tight_layout()
+        if save_path is not None:
+            figure.savefig(save_path)
+        return figure
+
+    def acceptance_rate(self, burn_in=0):
+        """Return overall and per-move acceptance rates after burn-in."""
+        self._check_burn_in(burn_in)
+        outcomes = self.move_outcomes[burn_in:]
+        overall = sum(accepted for _, accepted in outcomes) / len(outcomes)
+        by_move = {}
+        for name in self.moves:
+            selected = [accepted for move, accepted in outcomes if move == name]
+            by_move[name] = sum(selected) / len(selected) if selected else None
+        return {"overall": overall, "by_move": by_move}
+
+    def mixing_diagnostics(self, statistic=None, burn_in=0, max_lag=1000):
+        """Estimate single-chain mixing; ESS is approximate, not a convergence test."""
+        self._check_burn_in(burn_in)
+        if not isinstance(max_lag, (int, np.integer)) or max_lag < 1:
+            raise ValueError("max_lag must be a positive integer")
+        values = self._trace_values(statistic)[burn_in:]
+        n = len(values)
+        centered = values - values.mean()
+        variance = np.dot(centered, centered) / n
+        result = {
+            "draws": n,
+            "mean": float(values.mean()),
+            "lag1_autocorrelation": None,
+            "approximate_ess": None,
+        }
+        if n > 1 and variance > 0:
+            n_lags = min(max_lag, n - 1)
+            autocorrelations = np.array([
+                np.dot(centered[:-lag], centered[lag:])
+                / (n * variance)
+                for lag in range(1, n_lags + 1)
+            ])
+            result["lag1_autocorrelation"] = float(autocorrelations[0])
+
+            # Initial positive sequence: rho(0)+rho(1), rho(2)+rho(3), ...
+            correlation_sum = autocorrelations[0]
+            for lag in range(1, n_lags - 1, 2):
+                pair = autocorrelations[lag] + autocorrelations[lag + 1]
+                if pair <= 0:
+                    break
+                correlation_sum += pair
+            result["approximate_ess"] = float(
+                min(n, n / max(1 + 2 * correlation_sum, 1e-12))
+            )
+
+        if statistic is None and hasattr(self.states[0], "k"):
+            result["model_switch_rate"] = (
+                float(np.mean(np.diff(values) != 0)) if n > 1 else None
+            )
+            indices, counts = np.unique(values.astype(int), return_counts=True)
+            result["model_index_frequencies"] = {
+                int(index): float(count / n) for index, count in zip(indices, counts)
+            }
+        return result
+
+    def evaluate(self, statistic=None, burn_in=0, trace_path=None, max_lag=1000):
+        """Return the plot, acceptance rates, and mixing results for the last run."""
+        return {
+            "acceptance_rate": self.acceptance_rate(burn_in=burn_in),
+            "mixing": self.mixing_diagnostics(
+                statistic=statistic, burn_in=burn_in, max_lag=max_lag
+            ),
+            "trace_plot": self.trace_plot(
+                statistic=statistic, burn_in=burn_in, save_path=trace_path
+            ),
+        }
