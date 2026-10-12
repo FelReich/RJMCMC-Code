@@ -48,8 +48,8 @@ class _ChangePointMove(BaseMove):
             raise ValueError("L must be positive")
         if not np.isfinite(alpha) or alpha <= 0 or not np.isfinite(beta) or beta <= 0:
             raise ValueError("Gamma prior parameters must be positive")
-        if not np.isfinite(param) or param < 0:
-            raise ValueError("Poisson prior parameter must be non-negative")
+        if not np.isfinite(param) or param <= 0:
+            raise ValueError("Poisson prior parameter must be positive")
         if not isinstance(kmax, (int, np.integer)) or kmax < 0:
             raise ValueError("kmax must be a non-negative integer")
         if self.days.ndim != 1 or np.any(~np.isfinite(self.days)):
