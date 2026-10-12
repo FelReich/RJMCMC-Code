@@ -141,6 +141,7 @@ class BaseRJMCMC:
     def _trace_values(self, statistic=None):
         if self.states is None:
             raise RuntimeError("Run the chain before evaluating it")
+        # Unless a statistic is given use model indicator k.
         if statistic is None:
             if all(hasattr(state, "k") for state in self.states):
                 values = [state.k for state in self.states]
@@ -192,7 +193,7 @@ class BaseRJMCMC:
         return {"overall": overall, "by_move": by_move}
 
     def mixing_diagnostics(self, statistic=None, burn_in=0, max_lag=1000):
-        """Estimate single-chain mixing; ESS is approximate, not a convergence test."""
+        """Estimate single-chain mixing."""
         self._check_burn_in(burn_in)
         if not isinstance(max_lag, (int, np.integer)) or max_lag < 1:
             raise ValueError("max_lag must be a positive integer")
@@ -222,9 +223,7 @@ class BaseRJMCMC:
                 if pair <= 0:
                     break
                 correlation_sum += pair
-            result["approximate_ess"] = float(
-                min(n, n / max(1 + 2 * correlation_sum, 1e-12))
-            )
+            result["approximate_ess"] = float(n / (1 + 2 * correlation_sum))
 
         if statistic is None and hasattr(self.states[0], "k"):
             result["model_switch_rate"] = (
