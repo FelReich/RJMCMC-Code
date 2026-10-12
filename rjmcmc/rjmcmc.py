@@ -42,15 +42,10 @@ class BaseMove(ABC):
 
 class BaseRJMCMC:
     def __init__(self, moves, move_weights, seed=None):
-        if not moves or set(moves) != set(move_weights):
-            raise ValueError("Give every move exactly one weight")
-        if any(
-            not np.isfinite(weight) or weight < 0
-            for weight in move_weights.values()
-        ):
-            raise ValueError("Move weights must be finite and non-negative")
-        if not any(weight > 0 for weight in move_weights.values()):
-            raise ValueError("At least one move must have a positive weight")
+        if not moves:
+            raise ValueError("Give at least one move")
+        if not callable(move_weights):
+            self._check_move_weights(moves, move_weights)
 
         self.moves = moves
         self.move_weights = move_weights
@@ -58,12 +53,27 @@ class BaseRJMCMC:
         self.states = None
         self.move_outcomes = None
 
+    @staticmethod
+    def _check_move_weights(moves, weights):
+        if set(moves) != set(weights):
+            raise ValueError("Give every move exactly one weight")
+        if any(not np.isfinite(weight) or weight < 0 for weight in weights.values()):
+            raise ValueError("Move weights must be finite and non-negative")
+        if not any(weight > 0 for weight in weights.values()):
+            raise ValueError("At least one move must have a positive weight")
+
     def move_probabilities(self, state):
-        """Normalize weights over moves available at this state."""
+        """Normalize fixed or state-dependent weights over available moves."""
+        weights = (
+            self.move_weights(state)
+            if callable(self.move_weights)
+            else self.move_weights
+        )
+        self._check_move_weights(self.moves, weights)
         available = {
-            name: self.move_weights[name]
+            name: weights[name]
             for name, move in self.moves.items()
-            if self.move_weights[name] > 0 and move.available(state)
+            if weights[name] > 0 and move.available(state)
         }
         if not available:
             raise ValueError("No positive-weight moves available for this state")
@@ -88,15 +98,13 @@ class BaseRJMCMC:
         # The reverse move is selected from the proposed state, where the
         # available moves and their probabilities may differ.
         reverse_move = self.moves.get(proposal.reverse_move)
-        if (
-            reverse_move is None
-            or self.move_weights[proposal.reverse_move] == 0
-            or not reverse_move.available(proposal.state)
-        ):
+        if reverse_move is None or not reverse_move.available(proposal.state):
             return state, chosen, False
         reverse_probability = self.move_probabilities(proposal.state).get(
             proposal.reverse_move, 0.0
         )
+        if reverse_probability == 0:
+            return state, chosen, False
 
         # The chosen move applies its own acceptance rule, including both
         # move-choice probabilities. The sampler only records the result.

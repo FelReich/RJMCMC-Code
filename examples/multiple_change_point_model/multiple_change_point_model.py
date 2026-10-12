@@ -80,13 +80,12 @@ def load_disaster_days(path: Path = DATA_FILE) -> np.ndarray:
 
 
 class MultipleChangePointModel(BaseRJMCMC):
-    """RJMCMC sampler with fixed model settings and a current chain state."""
+    """RJMCMC sampler with Green's model-dependent move probabilities."""
 
     def __init__(
-        self, moves, move_weights, alpha, beta, param, kmax, L,
-        initial_state: State | None = None, seed=None,
+        self, moves, alpha, beta, param, kmax, L,
+        initial_state: State | None = None, seed=None, move_weights=None,
     ):
-        super().__init__(moves, move_weights, seed)
         if not np.isfinite(alpha) or alpha <= 0 or not np.isfinite(beta) or beta <= 0:
             raise ValueError("Gamma prior parameters alpha and beta must be positive")
         if not np.isfinite(param) or param < 0:
@@ -100,6 +99,28 @@ class MultipleChangePointModel(BaseRJMCMC):
         self.param = param
         self.kmax = kmax
         self.L = L
+
+        if move_weights is None:
+            expected = {"height", "position", "birth", "death"}
+            if set(moves) != expected:
+                raise ValueError("Green's move probabilities require all four moves")
+
+            # For a truncated Poisson prior, p(k+1)/p(k) = param/(k+1).
+            raw_birth = np.zeros(kmax + 1)
+            raw_death = np.zeros(kmax + 1)
+            for k in range(kmax):
+                raw_birth[k] = min(1.0, param / (k + 1))
+            for k in range(1, kmax + 1):
+                raw_death[k] = min(1.0, k / param) if param > 0 else 1.0
+
+            # Largest common c satisfying b_k + d_k <= 0.9 at every k.
+            largest_sum = np.max(raw_birth + raw_death)
+            self.c = 0.9 / largest_sum if largest_sum > 0 else 0.0
+            self._birth_probabilities = self.c * raw_birth
+            self._death_probabilities = self.c * raw_death
+            move_weights = self._green_move_weights
+
+        super().__init__(moves, move_weights, seed)
 
         if initial_state is None:
             initial_state = State(
@@ -118,6 +139,28 @@ class MultipleChangePointModel(BaseRJMCMC):
                 "Initial change points must lie in (0, L), with at most kmax points"
             )
         self.state = initial_state
+
+    def _green_move_weights(self, state):
+        """Green's birth/death probabilities and the remaining within-model mass."""
+        k = state.k
+        if not 0 <= k <= self.kmax:
+            raise ValueError("State k must lie between 0 and kmax")
+        birth = float(self._birth_probabilities[k])
+        death = float(self._death_probabilities[k])
+        remaining = 1.0 - birth - death
+        if k == 0:
+            return {
+                "height": remaining,
+                "position": 0.0,
+                "birth": birth,
+                "death": 0.0,
+            }
+        return {
+            "height": remaining / 2,
+            "position": remaining / 2,
+            "birth": birth,
+            "death": death,
+        }
 
     def sample_gamma_prior(self, n=1):
         return self.rng.gamma(self.alpha, 1 / self.beta, n)

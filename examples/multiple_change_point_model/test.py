@@ -31,9 +31,9 @@ POISSON_LAMBDA = 3.0
 K_MAX = 30
 ALPHA = 1.0
 BETA = 200.0
-N_STEPS = 40_000
+N_STEPS = 44_000
 BURN_IN = 4_000
-SEED = 42
+SEED = 2026
 TRACE_PDF = Path(__file__).with_name("test_trace.pdf")
 
 
@@ -53,11 +53,8 @@ def main():
         "birth": BirthMove(**move_settings),
         "death": DeathMove(**move_settings),
     }
-    move_weights = {name: 1.0 for name in moves}
-
     model = MultipleChangePointModel(
         moves=moves,
-        move_weights=move_weights,
         **settings,
         seed=SEED,
     )
