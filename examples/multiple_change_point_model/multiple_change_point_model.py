@@ -187,6 +187,3 @@ class MultipleChangePointModel(BaseRJMCMC):
         return super().run(self.state, n_steps)
 
 
-# Add the log likelihood and priors before implementing concrete BaseMove
-# subclasses (e.g. birth, death, rate change, and position change). Each
-# move will return a Proposal and use its own derived acceptance probability.
