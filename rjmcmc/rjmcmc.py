@@ -252,6 +252,8 @@ class BaseRJMCMC:
         It should vary within models; the model index itself does not.
         By default, the model identifier is state.k. Ratios are direct quotients
         of the paired variance estimates, not square roots.
+        The result exposes selected_models and visit_counts[i][k] = K(i,k),
+        with chains numbered from 1 and counts taken after burn-in.
         """
         if not callable(statistic):
             raise TypeError("statistic must be a scalar function of state")
@@ -299,6 +301,15 @@ class BaseRJMCMC:
                 raise ValueError(
                     "Every chosen model needs at least two draws in every chain"
                 )
+
+        # Include excluded models and zero counts so the selection is auditable.
+        observed_models = list(dict.fromkeys(
+            label for chain in observed for label in chain
+        ))
+        visit_counts = {
+            i: {label: len(chain.get(label, ())) for label in observed_models}
+            for i, chain in enumerate(observed, start=1)
+        }
 
         n_chains = len(observed)
         n_models = len(chosen)
@@ -360,6 +371,8 @@ class BaseRJMCMC:
             return float(numerator / denominator)
 
         return {
+            "selected_models": tuple(chosen),
+            "visit_counts": visit_counts,
             "models": tuple(chosen),
             "n_chains": n_chains,
             "retained_draws_per_chain": len(retained[0]),
