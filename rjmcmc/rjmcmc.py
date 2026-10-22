@@ -249,7 +249,6 @@ class BaseRJMCMC:
         Each entry in chains is a history as returned by run(), including its
         initial state. burn_in counts updates, so the retained states start at
         index burn_in + 1. statistic must have the same meaning in every model.
-        It should vary within models; the model index itself does not.
         By default, the model identifier is state.k. Ratios are direct quotients
         of the paired variance estimates, not square roots.
         The result exposes selected_models and visit_counts[i][k] = K(i,k),

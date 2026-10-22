@@ -1,0 +1,58 @@
+{
+  "data_file": "data/coal_disasters.csv",
+  "data_sha256": "4fcaf483ef091257902b45c5d99444b5e78682fb5d84bb64a5462dfcbc16c9e8",
+  "observation_end_day": 40907,
+  "total_updates_per_chain": 44000,
+  "burn_in_updates": 4000,
+  "retained_states_per_chain": 40000,
+  "common_prior": {
+    "alpha": 1,
+    "beta": 200,
+    "kmax": 30
+  },
+  "baseline": {
+    "lambda": 3.0,
+    "chains": [
+      {
+        "chain_id": "base_1",
+        "seed": 20261022,
+        "initial_k": 0
+      },
+      {
+        "chain_id": "base_2",
+        "seed": 20261023,
+        "initial_k": 1
+      },
+      {
+        "chain_id": "base_3",
+        "seed": 20261024,
+        "initial_k": 2
+      },
+      {
+        "chain_id": "base_4",
+        "seed": 20261025,
+        "initial_k": 3
+      },
+      {
+        "chain_id": "base_5",
+        "seed": 20261026,
+        "initial_k": 4
+      }
+    ]
+  },
+  "alternative": {
+    "lambda": 4.0,
+    "chain_id": "alternative_1",
+    "seed": 20261027,
+    "initial_k": 2
+  },
+  "csv_columns": [
+    "chain_id",
+    "iteration",
+    "prior_lambda",
+    "k",
+    "change_points",
+    "intensities",
+    "H"
+  ]
+}
