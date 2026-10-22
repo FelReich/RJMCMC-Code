@@ -88,8 +88,8 @@ class MultipleChangePointModel(BaseRJMCMC):
     ):
         if not np.isfinite(alpha) or alpha <= 0 or not np.isfinite(beta) or beta <= 0:
             raise ValueError("Gamma prior parameters alpha and beta must be positive")
-        if not np.isfinite(param) or param < 0:
-            raise ValueError("Poisson prior parameter must be non-negative")
+        if not np.isfinite(param) or param <= 0:
+            raise ValueError("Poisson prior parameter must be positive")
         if not isinstance(kmax, (int, np.integer)) or kmax < 0:
             raise ValueError("kmax must be a non-negative integer")
         if not np.isfinite(L) or L <= 0:
@@ -111,7 +111,7 @@ class MultipleChangePointModel(BaseRJMCMC):
             for k in range(kmax):
                 raw_birth[k] = min(1.0, param / (k + 1))
             for k in range(1, kmax + 1):
-                raw_death[k] = min(1.0, k / param) if param > 0 else 1.0
+                raw_death[k] = min(1.0, k / param)
 
             # Largest common c satisfying b_k + d_k <= 0.9 at every k.
             largest_sum = np.max(raw_birth + raw_death)
