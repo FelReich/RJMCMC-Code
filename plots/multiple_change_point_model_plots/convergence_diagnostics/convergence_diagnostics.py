@@ -15,6 +15,7 @@ import numpy as np  # noqa: E402
 
 DEFAULT_CHECKPOINTS = (1000, 2000, 4000, 6000, 8000, 12000, 16000,
                        20000, 24000, 30000, 36000, 40000)
+SELECTED_MODELS = tuple(range(1, 9))
 COMPARISONS = (
     ("overall", "V_hat", "W_c", "V_hat_over_W_c"),
     ("within_model", "W_m", "W_m_W_c", "W_m_over_W_m_W_c"),
@@ -78,7 +79,7 @@ def main():
     parser.add_argument("--checkpoints", type=int, nargs="*",
                         default=DEFAULT_CHECKPOINTS)
     parser.add_argument("--reference-checkpoint", type=int, default=4000,
-                        help="Select a fixed model set from this prefix")
+                        help="Require models 1-8 to be eligible by this prefix")
     args = parser.parse_args()
     style()
     chains = baseline_chains()
@@ -89,10 +90,13 @@ def main():
     if checkpoints[0] < 1 or checkpoints[-1] > n_total:
         parser.error("Every checkpoint must be within the retained chain")
 
-    _, fixed_models = counts_and_eligible(chains, args.reference_checkpoint)
-    _, all_final_eligible = counts_and_eligible(chains, n_total)
-    if len(fixed_models) < 2 or len(all_final_eligible) < 2:
-        raise ValueError("At least two models need two visits in every chain")
+    _, eligible_at_reference = counts_and_eligible(chains, args.reference_checkpoint)
+    fixed_models = list(SELECTED_MODELS)
+    if not set(fixed_models).issubset(eligible_at_reference):
+        raise ValueError(
+            "Models 1-8 need at least two visits in every chain by the "
+            "reference checkpoint"
+        )
     all_final_observed = sorted({draw.state.k for draws in chains.values()
                                  for draw in draws})
     checkpoints_rows = []
@@ -136,21 +140,10 @@ def main():
     fixed_k = BaseRJMCMC.two_way_anova(
         final_histories, k_statistic, models=fixed_models
     )
-    full_h = BaseRJMCMC.two_way_anova(
-        final_histories, h_statistic, models=all_final_eligible
-    )
-    full_k = BaseRJMCMC.two_way_anova(
-        final_histories, k_statistic, models=all_final_eligible
-    )
-    rows = []
-    for subset, models, h_result, k_result in (
-        ("fixed_progression", fixed_models, fixed_h, fixed_k),
-        ("all_final_eligible", all_final_eligible, full_h, full_k),
-    ):
-        rows.extend(final_rows(h_result, "H", subset, all_final_observed,
-                               coverage(models)))
-        rows.extend(final_rows(k_result, "k", subset, all_final_observed,
-                               coverage(models)))
+    rows = final_rows(fixed_h, "H", "fixed_progression", all_final_observed,
+                      coverage(fixed_models))
+    rows.extend(final_rows(fixed_k, "k", "fixed_progression",
+                           all_final_observed, coverage(fixed_models)))
 
     path = Path(__file__)
     with path.with_suffix(".csv").open("w", newline="", encoding="utf-8") as stream:
@@ -176,11 +169,11 @@ def main():
         axis.set_xlabel("Retained iterations per chain")
         axis.grid(alpha=0.2)
         axis.legend()
-    axes[0].set_ylabel("Variance estimate for H (disasters$^2$)")
+    axes[0].set_ylabel("Variance estimate for H")
     figure.suptitle("Brooks-Giudici comparisons for expected disasters")
     figure.tight_layout(rect=(0, 0.045, 1, 0.94))
     figure.savefig(path.with_suffix(".pdf"))
-    print(f"Fixed models: {fixed_models}; all final eligible: {all_final_eligible}")
+    print(f"Selected models: {fixed_models}")
     print(f"Final H variance ratio V_hat/W_c (fixed): {fixed_h['ratios']['V_hat_over_W_c']:.4f}")
     print(f"Final k variance ratio V_hat/W_c (fixed): {fixed_k['ratios']['V_hat_over_W_c']:.4f}")
 

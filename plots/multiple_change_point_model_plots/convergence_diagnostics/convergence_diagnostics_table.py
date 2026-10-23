@@ -25,6 +25,8 @@ RATIO_SYMBOL = {
     ("W_m", "W_m_W_c"): r"$W_m/W_mW_c$",
     ("B_m", "B_m_W_c"): r"$B_m/B_mW_c$",
 }
+
+
 def load_rows():
     path = HERE / "convergence_diagnostics.csv"
     if not path.exists():
@@ -33,9 +35,9 @@ def load_rows():
         )
     with path.open(newline="", encoding="utf-8") as stream:
         rows = [row for row in csv.DictReader(stream)
-                if row["model_subset"] == "all_final_eligible"]
+                if row["model_subset"] == "fixed_progression"]
     if not rows:
-        raise ValueError(f"No all-eligible diagnostics in {path}")
+        raise ValueError(f"No fixed-model diagnostics in {path}")
     for row in rows:
         numerator = float(row["numerator"])
         denominator = float(row["denominator"])
