@@ -1,18 +1,18 @@
-"""Pooled posterior mass function of the number of change points."""
+"""Posterior mass function of k from baseline chain 1."""
 
 import csv
 from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from common import all_draws, baseline_chains, style  # noqa: E402
+from common import first_baseline_chain, style  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
 
 def main():
     style()
-    draws = all_draws(baseline_chains())
+    draws = first_baseline_chain()
     indices, counts = np.unique([draw.state.k for draw in draws], return_counts=True)
     probabilities = counts / counts.sum()
     mean_k = float(np.dot(indices, probabilities))

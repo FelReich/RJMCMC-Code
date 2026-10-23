@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import (  # noqa: E402
-    END_DAY, all_draws, baseline_chains, fixed_gaussian_kde, style,
+    END_DAY, first_baseline_chain, fixed_gaussian_kde, style,
 )
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
@@ -18,7 +18,7 @@ CURVES = {1: ("-", "#254f75"), 2: (":", "#b46028"),
 
 def main():
     style()
-    draws = all_draws(baseline_chains())
+    draws = first_baseline_chain()
     grid = np.linspace(0, END_DAY, 800)
     figure, axis = plt.subplots(figsize=(8.3, 4.8))
     for k, (linestyle, color) in CURVES.items():
@@ -26,8 +26,7 @@ def main():
         if not conditional:
             raise ValueError(f"No retained states for k={k}")
         positions = np.stack(conditional)
-        # Each ordered coordinate has its own conditional marginal. Pool the
-        # five chains within k, but never pool the k coordinates together.
+        # Each ordered coordinate has its own conditional marginal from chain 1.
         for j in range(k):
             density = fixed_gaussian_kde(positions[:, j], grid, BANDWIDTH_DAYS)
             axis.plot(grid, density, linestyle=linestyle, color=color,

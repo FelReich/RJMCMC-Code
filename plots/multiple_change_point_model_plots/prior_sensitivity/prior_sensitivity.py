@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import (  # noqa: E402
-    ALTERNATIVE_CSV, all_draws, baseline_chains, load_chains, style,
+    ALTERNATIVE_CSV, all_draws, first_baseline_chain, load_chains, style,
 )
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
@@ -41,7 +41,7 @@ def summary(chains, label):
 
 def main():
     style()
-    base_chains = baseline_chains()
+    base_chains = {"base_1": first_baseline_chain()}
     alt_chains = load_chains(ALTERNATIVE_CSV)
     if list(alt_chains) != ["alternative_1"]:
         raise ValueError("Expected exactly one alternative-prior chain")
@@ -66,7 +66,7 @@ def main():
     axis.grid(axis="y", alpha=0.2)
     axis.legend()
     figure.text(0.5, 0.01,
-                "Alternative prior: one chain; multi-chain convergence cannot be assessed.",
+                "One chain per prior; multi-chain convergence is not assessed here.",
                 ha="center", fontsize=8)
     figure.tight_layout(rect=(0, 0.04, 1, 1))
     figure.savefig(path.with_suffix(".pdf"))

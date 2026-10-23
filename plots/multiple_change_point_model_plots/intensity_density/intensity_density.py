@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from common import all_draws, baseline_chains, fixed_gaussian_kde, style  # noqa: E402
+from common import first_baseline_chain, fixed_gaussian_kde, style  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
@@ -16,7 +16,7 @@ CURVES = {1: ("-", "#254f75"), 2: (":", "#b46028"),
 
 def main():
     style()
-    draws = all_draws(baseline_chains())
+    draws = first_baseline_chain()
     conditional = {
         k: np.stack([draw.state.intensities for draw in draws if draw.state.k == k])
         for k in CURVES

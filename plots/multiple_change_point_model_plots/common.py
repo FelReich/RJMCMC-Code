@@ -41,8 +41,8 @@ def expected_disasters(state):
     return float(np.dot(state.intensities, np.diff(bounds)))
 
 
-def load_chains(path):
-    """Rebuild every state; check dimensions, iterations, and the saved H."""
+def load_chains(path, chain_id=None):
+    """Rebuild selected states; check dimensions, iterations, and saved H."""
     chains = {}
     with Path(path).open(newline="", encoding="utf-8") as stream:
         reader = csv.DictReader(stream)
@@ -51,6 +51,8 @@ def load_chains(path):
         if not required.issubset(reader.fieldnames or ()):
             raise ValueError(f"Missing required columns in {path}")
         for row in reader:
+            if chain_id is not None and row["chain_id"] != chain_id:
+                continue
             state = State(int(row["k"]), json.loads(row["change_points"]),
                           json.loads(row["intensities"]))
             iteration = int(row["iteration"])
@@ -90,7 +92,10 @@ def baseline_chains():
 
 
 def first_baseline_chain():
-    return baseline_chains()["base_1"]
+    chains = load_chains(BASE_CSV, chain_id="base_1")
+    if "base_1" not in chains:
+        raise ValueError("Baseline chain 1 is missing")
+    return chains["base_1"]
 
 
 def all_draws(chains):
@@ -110,7 +115,7 @@ def style():
 
 
 def saved_trace_plot(draws, statistic=None, label=None):
-    """Reuse BaseRJMCMC.trace_plot and put the real CSV iteration on its x-axis.
+    """Reuse BaseRJMCMC.trace_plot and number retained draws from 1.
 
     The base method expects an initial state preceding its recorded updates.
     A duplicate first retained state is supplied only as that synthetic initial
@@ -122,10 +127,11 @@ def saved_trace_plot(draws, statistic=None, label=None):
     figure = reader.trace_plot(statistic=statistic, label=label)
     axis = figure.axes[0]
     line = axis.lines[0]
-    line.set_data([draw.iteration for draw in draws], line.get_ydata()[1:])
+    line.set_data(np.arange(1, len(draws) + 1), line.get_ydata()[1:])
     axis.relim()
     axis.autoscale_view()
-    axis.set_xlim(draws[0].iteration, draws[-1].iteration)
+    axis.set_xlim(0, len(draws))
+    axis.set_xlabel("Retained iteration (after burn-in)")
     figure.tight_layout()
     return figure
 
