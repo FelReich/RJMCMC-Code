@@ -1,0 +1,21 @@
+
+ coal/1: ./cpt.exe -n40000 -nb4000 -ns1 -a1 -b200 -l3 -seed1234 coal 
+ random number seed:        1234
+
+alpha     1.0000
+beta    200.0000
+lambda    3.0000
+seed          1234
+nsweep       40000
+nburnin       4000
+
+         acc    try
+death   3324  18325
+birth   3329  15039
+ht     21201  40000
+pos     8222  40000
+
+total acceptances  36076
+
+mean k        3.3393
+

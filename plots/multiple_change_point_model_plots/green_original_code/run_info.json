@@ -1,0 +1,21 @@
+{
+  "source_url": "https://people.maths.bris.ac.uk/~mapjg/Cpt/",
+  "source_cpt_sha256": "3ae41a53420bb880eaa497188e6ed1b618d73db3bbfa389ccebda05cb395069f",
+  "data_sha256": "268281a5f9438b35014464c695fc112569e786508089fc346f51c99915ab80ae",
+  "coal_data_event_count": 191,
+  "compiler_compatibility_fixes": [
+    "Replace two integer 1 arguments to MIN by real 1.0 in a temporary cpt.f copy",
+    "Force-include time.h when compiling sd.c"
+  ],
+  "seed": 1234,
+  "burn_in_sweeps": 4000,
+  "retained_sweeps": 40000,
+  "total_sweeps": 44000,
+  "sampling_interval": 1,
+  "alpha": 1,
+  "beta": 200,
+  "lambda": 3,
+  "k_max": 30,
+  "posterior_mean_k": 3.339275,
+  "posterior_mode_k": 3
+}

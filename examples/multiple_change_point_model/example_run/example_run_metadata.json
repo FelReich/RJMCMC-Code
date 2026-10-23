@@ -1,6 +1,6 @@
 {
   "data_file": "data/coal_disasters.csv",
-  "data_sha256": "4fcaf483ef091257902b45c5d99444b5e78682fb5d84bb64a5462dfcbc16c9e8",
+  "data_sha256": "da98656b2eddea7ba6d6afc14911df70537bcf9eb9ff8b93973d5931aa1c36c7",
   "observation_end_day": 40907,
   "total_updates_per_chain": 44000,
   "burn_in_updates": 4000,

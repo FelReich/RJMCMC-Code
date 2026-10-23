@@ -1,3 +1,3 @@
 prior,lambda,n_chains,n_retained_draws,posterior_mean_H,H_95_percent_lower,H_95_percent_upper,posterior_mean_k,posterior_mode_k,convergence_note
-baseline,3.0,1,40000,191.43968822583756,162.7258561917643,219.48681582049593,3.259225,3,One chain; no multi-chain convergence diagnostic
-alternative,4.0,1,40000,190.58251210915455,166.5896297630928,218.43913073626615,3.98455,4,One chain; no multi-chain convergence diagnostic
+baseline,3.0,1,40000,191.3320677673556,167.18960150498123,216.65108810758463,3.253975,3,One chain; no multi-chain convergence diagnostic
+alternative,4.0,1,40000,191.16744957686157,164.86382694847424,218.93231612443415,4.00325,4,One chain; no multi-chain convergence diagnostic
