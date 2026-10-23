@@ -32,8 +32,7 @@ def main():
             axis.plot(grid, density, linestyle=linestyle, color=color,
                       linewidth=1.5, label=f"k = {k}" if j == 0 else None)
     axis.set(xlabel="Change-point position (days)",
-             ylabel="Conditional posterior density (day$^{-1}$)",
-             title="Change-point locations conditional on k")
+             ylabel="Conditional posterior density (day$^{-1}$)")
     axis.set_xlim(0, END_DAY)
     axis.grid(alpha=0.2)
     axis.legend(title="Number of change points")

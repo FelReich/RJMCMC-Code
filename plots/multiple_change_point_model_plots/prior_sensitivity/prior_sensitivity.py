@@ -60,8 +60,7 @@ def main():
              width=width, color="#41658a", label=f"Baseline ($\\lambda$ = {base_row['lambda']:g})")
     axis.bar(indices + width / 2, [alt_mass.get(int(k), 0) for k in indices],
              width=width, color="#ba6b35", label=f"Alternative ($\\lambda$ = {alt_row['lambda']:g})")
-    axis.set(xlabel="Number of change points k", ylabel="Posterior probability",
-             title="Sensitivity of the posterior distribution of k")
+    axis.set(xlabel="Number of change points k", ylabel="Posterior probability")
     axis.set_xticks(indices)
     axis.grid(axis="y", alpha=0.2)
     axis.legend()

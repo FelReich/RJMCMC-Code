@@ -37,8 +37,7 @@ def main():
             axis.plot(grid, density, linestyle=linestyle, color=color,
                       linewidth=1.5, label=f"k = {k}" if j == 0 else None)
     axis.set(xlabel="Segment intensity (disasters per day)",
-             ylabel="Conditional posterior density (days)",
-             title="Segment intensities conditional on k")
+             ylabel="Conditional posterior density (days)")
     axis.set_xlim(0, largest)
     axis.grid(alpha=0.2)
     axis.legend(title="Number of change points")
