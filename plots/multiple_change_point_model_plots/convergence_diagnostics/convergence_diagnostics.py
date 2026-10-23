@@ -170,7 +170,6 @@ def main():
         axis.grid(alpha=0.2)
         axis.legend()
     axes[0].set_ylabel("Variance estimate for H")
-    figure.suptitle("Brooks-Giudici comparisons for expected disasters")
     figure.tight_layout(rect=(0, 0.045, 1, 0.94))
     figure.savefig(path.with_suffix(".pdf"))
     print(f"Selected models: {fixed_models}")
