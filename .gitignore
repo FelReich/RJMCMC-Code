@@ -4,5 +4,4 @@ __pycache__/
 examples/multiple_change_point_model/test_trace.pdf
 # Original Cpt Fortran implementation by Peter J. Green
 # Download separately from https://people.maths.bris.ac.uk/~mapjg/Cpt/
-plots/multiple_change_point_model_plots/green_original_code/Cpt/
 /plots/multiple_change_point_model_plots/green_original_code/Cpt/
