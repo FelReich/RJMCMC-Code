@@ -123,12 +123,9 @@ def save_results(k_samples, log_text):
     })
     figure, axis = plt.subplots(figsize=(7.3, 4.3))
     axis.bar(indices, probabilities, width=0.82, color="#41658a")
-    axis.set(xlabel="Number of change points k", ylabel="Posterior probability",
-             title="Posterior distribution of k - Green")
+    axis.set(xlabel="Number of change points k", ylabel="Posterior probability")
     axis.set_xticks(indices)
     axis.set_ylim(0, max(probabilities) * 1.15)
-    axis.text(0.98, 0.96, f"Mean = {mean_k:.2f}; mode = {mode_k}",
-              transform=axis.transAxes, ha="right", va="top")
     axis.grid(axis="y", alpha=0.2)
     figure.tight_layout()
     figure.savefig(HERE / "posterior_k_green.pdf")

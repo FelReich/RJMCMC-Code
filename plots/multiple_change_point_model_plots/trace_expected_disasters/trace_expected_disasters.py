@@ -15,7 +15,6 @@ def main():
     figure = saved_trace_plot(draws, statistic=expected_disasters,
                               label="Expected number of disasters")
     axis = figure.axes[0]
-    axis.set_title("Expected disasters")
     figure.savefig(Path(__file__).with_suffix(".pdf"))
 
 
