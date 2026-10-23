@@ -131,7 +131,7 @@ def save_results(k_samples, log_text):
               transform=axis.transAxes, ha="right", va="top")
     axis.grid(axis="y", alpha=0.2)
     figure.tight_layout()
-    figure.savefig(HERE / "posterior_k.pdf")
+    figure.savefig(HERE / "posterior_k_green.pdf")
     plt.close(figure)
     return mean_k, mode_k
 
@@ -162,7 +162,7 @@ def main():
     mean_k, mode_k = save_results(k_samples, log_text)
     print(output.strip())
     print(f"Saved {len(k_samples):,} samples; mean k={mean_k:.4f}, mode k={mode_k}")
-    print(f"Figure: {HERE / 'posterior_k.pdf'}")
+    print(f"Figure: {HERE / 'posterior_k_green.pdf'}")
 
 
 if __name__ == "__main__":
