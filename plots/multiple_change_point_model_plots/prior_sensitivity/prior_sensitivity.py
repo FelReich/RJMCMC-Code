@@ -65,9 +65,6 @@ def main():
     axis.set_xticks(indices)
     axis.grid(axis="y", alpha=0.2)
     axis.legend()
-    figure.text(0.5, 0.01,
-                "One chain per prior; multi-chain convergence is not assessed here.",
-                ha="center", fontsize=8)
     figure.tight_layout(rect=(0, 0.04, 1, 1))
     figure.savefig(path.with_suffix(".pdf"))
 

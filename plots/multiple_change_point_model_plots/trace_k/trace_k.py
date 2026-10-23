@@ -12,7 +12,7 @@ def main():
     draws = first_baseline_chain()
     figure = saved_trace_plot(draws)
     axis = figure.axes[0]
-    axis.set_title("Number of change points - baseline chain 1")
+    axis.set_title("Number of change points")
     figure.savefig(Path(__file__).with_suffix(".pdf"))
 
 

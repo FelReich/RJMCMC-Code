@@ -178,9 +178,6 @@ def main():
         axis.legend()
     axes[0].set_ylabel("Variance estimate for H (disasters$^2$)")
     figure.suptitle("Brooks-Giudici comparisons for expected disasters")
-    figure.text(0.5, 0.02,
-                f"Fixed models {fixed_models}, selected at {args.reference_checkpoint:,} draws per chain",
-                ha="center", fontsize=8)
     figure.tight_layout(rect=(0, 0.045, 1, 0.94))
     figure.savefig(path.with_suffix(".pdf"))
     print(f"Fixed models: {fixed_models}; all final eligible: {all_final_eligible}")
