@@ -73,15 +73,16 @@ def main():
             f"{ratio} = {float(row['variance_ratio']):.4f}",
         ))
 
-    height = max(4.6, 1.9 + 0.43 * len(table_rows))
+    height = 0.31 * (len(table_rows) + 1) + 0.10
     figure, axis = plt.subplots(figsize=(12.7, height))
+    figure.subplots_adjust(left=0, right=1, bottom=0, top=1)
     axis.axis("off")
     table = axis.table(
         cellText=table_rows,
         colLabels=("Statistic", "Models", "Comparison",
                    "Numerator", "Denominator", "Ratio"),
         colWidths=(0.07, 0.19, 0.15, 0.19, 0.20, 0.20),
-        cellLoc="center", colLoc="center", bbox=(0.025, 0.16, 0.95, 0.68),
+        cellLoc="center", colLoc="center", bbox=(0.01, 0.02, 0.98, 0.96),
     )
     table.auto_set_font_size(False)
     table.set_fontsize(9.5)
@@ -94,7 +95,7 @@ def main():
         elif index % 2 == 0:
             cell.set_facecolor("#f8fafc")
     output = HERE / "convergence_diagnostics_table.pdf"
-    figure.savefig(output)
+    figure.savefig(output, pad_inches=0.02)
     plt.close(figure)
     print(f"Saved {output}")
 

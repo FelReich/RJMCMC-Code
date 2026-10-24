@@ -106,16 +106,17 @@ def main():
     rows.append(("Overall", f"{total_proposed:,}", f"{total_accepted:,}",
                  f"{total_accepted / total_proposed:.3f}"))
 
-    figure, axis = plt.subplots(figsize=(8.0, 3.6))
+    figure, axis = plt.subplots(figsize=(8.0, 1.95))
+    figure.subplots_adjust(left=0, right=1, bottom=0, top=1)
     axis.axis("off")
     table = axis.table(
         cellText=rows,
         colLabels=("Move type", "Proposed", "Accepted", "Acceptance rate"),
         colWidths=(0.29, 0.21, 0.21, 0.29),
-        cellLoc="center", colLoc="center", bbox=(0.04, 0.17, 0.92, 0.67),
+        cellLoc="center", colLoc="center", bbox=(0.01, 0.02, 0.98, 0.96),
     )
     table.auto_set_font_size(False)
-    table.set_fontsize(10.5)
+    table.set_fontsize(9.5)
     for (row, column), cell in table.get_celld().items():
         cell.set_edgecolor("#d5dde5")
         cell.set_linewidth(0.6)
@@ -128,7 +129,7 @@ def main():
         elif row % 2 == 0:
             cell.set_facecolor("#f8fafc")
     output = HERE / "acceptance_rate.pdf"
-    figure.savefig(output)
+    figure.savefig(output, pad_inches=0.02)
     plt.close(figure)
     print(f"Saved {output}")
 
