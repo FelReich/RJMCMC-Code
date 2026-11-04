@@ -11,7 +11,7 @@ import pandas as pd
 
 
 HERE = Path(__file__).resolve().parent
-DATA_FILE = HERE.parents[1] / "data" / "coal_disasters.csv"
+DATA_FILE = HERE.parents[2] / "data" / "coal_disasters.csv"
 START_DAY = 0
 END_DAY = 40907  # 1 January 1963, following 112 calendar years
 
@@ -53,7 +53,7 @@ def main() -> None:
     ax_events.set_xticks(np.arange(0, 40001, 5000))
 
     fig.subplots_adjust(left=0.16, right=0.98, top=0.98, bottom=0.13)
-    fig.savefig(HERE / "figure_2-1.pdf")
+    fig.savefig(HERE / "recorded_disaster_times.pdf")
     plt.close(fig)
     print(f"Plotted {len(days)} disasters from {DATA_FILE}")
 
