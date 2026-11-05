@@ -1,16 +1,19 @@
-"""Shared numerical calculations for the GCLM RJMCMC sampler.
+"""GCLM RJMCMC sampler and its shared numerical calculations.
 
 The sampler and its moves will use one GCLMCalculations instance. Its two
 cache slots hold only the current and proposed drift calculations, not the
 full history of states.
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 
 import numpy as np
 from scipy.linalg import cho_factor, cho_solve, eigvals, solve_continuous_lyapunov
 
-from examples.gclm.state import State
+from examples.gclm.state import Graph, State
+from rjmcmc.rjmcmc import BaseRJMCMC
 
 
 @dataclass(frozen=True, eq=False)
@@ -32,8 +35,8 @@ class GCLMCalculations:
     """Precompute data summaries and evaluate a GCLM state with C = 2 I_p.
 
     The log-likelihood omits the state-independent term -np log(2*pi)/2.
-    Use proposed=True for a candidate drift, then finish_proposal(accepted)
-    after the move to promote or discard its cached calculation.
+    Use proposed=True for a candidate drift, then call finish_proposal with
+    the returned state to promote or discard its cached calculation.
     """
 
     def __init__(self, observations, residual_tolerance=1e-8):
@@ -173,8 +176,176 @@ class GCLMCalculations:
             raise np.linalg.LinAlgError("Log-likelihood is not finite")
         return float(value)
 
-    def finish_proposal(self, accepted: bool) -> None:
-        """Promote an accepted proposed drift or discard a rejected one."""
+    def finish_proposal(self, accepted: bool, returned_state: State) -> None:
+        """Keep the current cache aligned with the state returned by a move."""
         if accepted and self._proposed is not None:
             self._current = self._proposed
         self._proposed = None
+        # Also handles moves that did not precompute their proposed drift.
+        self.drift(returned_state)
+
+
+_MOVE_NAMES = (
+    "mean", "contrast", "margin", "coefficient", "reversal", "birth", "death",
+)
+
+
+@dataclass(frozen=True)
+class GCLMPriorConfig:
+    """Graph space and hyperparameters defining the statistical model.
+
+    s_r, s_eta, tau, and s_mu are standard deviations, not variances.
+    """
+
+    graph_space: str
+    lambda_p: float
+    s_r: float
+    mu_eta: float
+    s_eta: float
+    tau: float
+    m_0: float
+    s_mu: float
+
+    def __post_init__(self):
+        if self.graph_space not in ("general", "simple"):
+            raise ValueError("graph_space must be 'general' or 'simple'")
+        for name in ("lambda_p", "s_r", "s_eta", "tau", "s_mu"):
+            value = getattr(self, name)
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError(f"{name} must be finite and positive")
+            object.__setattr__(self, name, float(value))
+        for name in ("mu_eta", "m_0"):
+            value = getattr(self, name)
+            if not np.isfinite(value):
+                raise ValueError(f"{name} must be finite")
+            object.__setattr__(self, name, float(value))
+
+
+@dataclass(frozen=True, eq=False)
+class GCLMProposalConfig:
+    """Proposal scales, coefficient-selection probability, and move weights."""
+
+    sigma_r: float
+    sigma_eta: float
+    sigma_b: float
+    gamma: float
+    move_weights: Mapping[str, float] | None = None
+
+    def __post_init__(self):
+        for name in ("sigma_r", "sigma_eta", "sigma_b"):
+            value = getattr(self, name)
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError(f"{name} must be finite and positive")
+            object.__setattr__(self, name, float(value))
+        if not np.isfinite(self.gamma) or not 0 < self.gamma <= 1:
+            raise ValueError("gamma must lie in (0, 1]")
+        object.__setattr__(self, "gamma", float(self.gamma))
+
+        weights = (
+            {name: 1.0 for name in _MOVE_NAMES}
+            if self.move_weights is None else self.move_weights
+        )
+        if not isinstance(weights, Mapping) or set(weights) != set(_MOVE_NAMES):
+            raise ValueError("Give a base weight for every GCLM move")
+        if any(not np.isfinite(weight) or weight <= 0 for weight in weights.values()):
+            raise ValueError("Base move weights must be finite and positive")
+        # Copy before freezing so changes to the input dictionary cannot leak in.
+        frozen_weights = MappingProxyType({
+            name: float(weights[name]) for name in _MOVE_NAMES
+        })
+        object.__setattr__(self, "move_weights", frozen_weights)
+
+
+class GCLM(BaseRJMCMC):
+    """RJMCMC sampler for general or simple graphical Lyapunov models.
+
+    Pass seven move objects that share this sampler's GCLMCalculations
+    instance. The moves implement their proposals and acceptance rules;
+    BaseRJMCMC selects moves using the graph-dependent weights below.
+    Prior and proposal settings are stored separately in frozen configs.
+    """
+
+    MOVE_NAMES = _MOVE_NAMES
+
+    def __init__(
+        self,
+        moves,
+        calculations: GCLMCalculations,
+        prior_config: GCLMPriorConfig,
+        proposal_config: GCLMProposalConfig,
+        *,
+        initial_state: State | None = None,
+        seed=None,
+    ):
+        if not isinstance(calculations, GCLMCalculations):
+            raise TypeError("calculations must be a GCLMCalculations instance")
+        if not isinstance(prior_config, GCLMPriorConfig):
+            raise TypeError("prior_config must be a GCLMPriorConfig")
+        if not isinstance(proposal_config, GCLMProposalConfig):
+            raise TypeError("proposal_config must be a GCLMProposalConfig")
+        if set(moves) != set(self.MOVE_NAMES):
+            raise ValueError("Provide all seven GCLM moves exactly once")
+        for name, move in moves.items():
+            if getattr(move, "calculations", None) is not calculations:
+                raise ValueError(f"{name} move must use the shared calculations")
+        self.prior_config = prior_config
+        self.proposal_config = proposal_config
+        self.calculations = calculations
+        super().__init__(moves, self._gclm_move_weights, seed)
+
+        if initial_state is None:
+            # Start in the empty graph at the prior centers.
+            initial_state = State(
+                graph=Graph(calculations.p, frozenset()),
+                mu=np.full(calculations.p, prior_config.m_0),
+                r=np.zeros(calculations.p - 1),
+                eta=np.exp(prior_config.mu_eta),
+                b=np.empty(0),
+            )
+        if not isinstance(initial_state, State):
+            raise TypeError("initial_state must be a GCLM State")
+        initial_state.validate_for_model(calculations.p, prior_config.graph_space)
+        self.state = initial_state
+        self.calculations.finish_proposal(False, initial_state)
+
+    def _gclm_move_weights(self, state: State) -> dict[str, float]:
+        """Graph-dependent unnormalized weights from the thesis."""
+        graph = state.graph
+        max_edges = (
+            graph.p * (graph.p - 1)
+            if self.prior_config.graph_space == "general"
+            else graph.p * (graph.p - 1) // 2
+        )
+        rho = graph.k / max_edges
+        weights = self.proposal_config.move_weights
+        return {
+            "mean": weights["mean"],
+            "contrast": weights["contrast"],
+            "margin": weights["margin"],
+            "coefficient": rho * weights["coefficient"],
+            "reversal": (
+                rho * weights["reversal"]
+                if graph.reversible_edges() else 0.0
+            ),
+            # A birth edge exists exactly when rho < 1 in either graph space.
+            "birth": (1.0 - rho) * weights["birth"],
+            "death": rho * weights["death"],
+        }
+
+    def step(self, state=None):
+        """Advance the stored state and keep the drift cache in sync."""
+        if state is None:
+            state = self.state
+        self.calculations.drift(state)
+        try:
+            next_state, name, accepted = super().step(state)
+        except Exception:
+            self.calculations.finish_proposal(False, state)
+            raise
+        self.calculations.finish_proposal(accepted, next_state)
+        self.state = next_state
+        return next_state, name, accepted
+
+    def run(self, n_steps):
+        """Continue the chain from its stored state."""
+        return super().run(self.state, n_steps)
