@@ -5,6 +5,7 @@ An edge (i, j) denotes i -> j, corresponding to drift entry M[j, i].
 Vertices use zero-based indices. Coefficients in State.b follow sorted edges.
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 import numpy as np
@@ -20,8 +21,8 @@ class Graph:
     def __post_init__(self):
         if isinstance(self.p, (bool, np.bool_)) or not isinstance(
             self.p, (int, np.integer)
-        ) or self.p < 1:
-            raise ValueError("p must be a positive integer")
+        ) or self.p < 2:
+            raise ValueError("The GCLM sampler requires an integer p >= 2")
 
         edges = tuple(self.edges)
         for edge in edges:
@@ -56,6 +57,13 @@ class Graph:
     def is_simple(self) -> bool:
         """Whether the graph contains no directed two-cycle."""
         return all((j, i) not in self.edges for i, j in self.edges)
+
+    def validate_space(self, graph_space: str) -> None:
+        """Check membership in the chosen general or simple graph space."""
+        if graph_space not in ("general", "simple"):
+            raise ValueError("graph_space must be 'general' or 'simple'")
+        if graph_space == "simple" and not self.is_simple:
+            raise ValueError("A simple graph cannot contain a directed two-cycle")
 
     def birth_edges(self, simple: bool = False) -> tuple[tuple[int, int], ...]:
         """Edges that may be added in the chosen graph space."""
@@ -128,3 +136,31 @@ class State:
         if not np.isfinite(eta) or eta <= 0:
             raise ValueError("eta must be finite and positive")
         object.__setattr__(self, "eta", eta)
+
+    @property
+    def coefficients_by_edge(self) -> dict[tuple[int, int], float]:
+        """Return each directed edge's coefficient, independent of array index."""
+        return dict(zip(self.graph.ordered_edges, self.b.tolist()))
+
+    @classmethod
+    def from_coefficients(
+        cls,
+        graph: Graph,
+        mu: np.ndarray,
+        r: np.ndarray,
+        eta: float,
+        coefficients: Mapping[tuple[int, int], float],
+    ) -> "State":
+        """Build b in canonical edge order from an edge-to-coefficient mapping."""
+        if not isinstance(graph, Graph):
+            raise TypeError("graph must be a Graph")
+        if not isinstance(coefficients, Mapping) or set(coefficients) != graph.edges:
+            raise ValueError("Provide exactly one coefficient for each graph edge")
+        b = [coefficients[edge] for edge in graph.ordered_edges]
+        return cls(graph, mu, r, eta, b)
+
+    def validate_for_model(self, p: int, graph_space: str) -> None:
+        """Validate an initial state against the sampler's data and graph space."""
+        if self.graph.p != p:
+            raise ValueError("The initial graph must match the data dimension p")
+        self.graph.validate_space(graph_space)
