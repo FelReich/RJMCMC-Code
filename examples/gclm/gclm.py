@@ -259,8 +259,8 @@ class GCLMProposalConfig:
 class GCLM(BaseRJMCMC):
     """RJMCMC sampler for general or simple graphical Lyapunov models.
 
-    Pass seven move objects that share this sampler's GCLMCalculations
-    instance. The moves implement their proposals and acceptance rules;
+    Pass move objects that share this sampler's calculations and config
+    instances. The moves implement their proposals and acceptance rules;
     BaseRJMCMC selects moves using the graph-dependent weights below.
     Prior and proposal settings are stored separately in frozen configs.
     """
@@ -284,10 +284,14 @@ class GCLM(BaseRJMCMC):
         if not isinstance(proposal_config, GCLMProposalConfig):
             raise TypeError("proposal_config must be a GCLMProposalConfig")
         if set(moves) != set(self.MOVE_NAMES):
-            raise ValueError("Provide all seven GCLM moves exactly once")
+            raise ValueError("Provide every GCLM move exactly once")
         for name, move in moves.items():
             if getattr(move, "calculations", None) is not calculations:
                 raise ValueError(f"{name} move must use the shared calculations")
+            if getattr(move, "prior", None) is not prior_config:
+                raise ValueError(f"{name} move must use the shared prior_config")
+            if getattr(move, "proposal", None) is not proposal_config:
+                raise ValueError(f"{name} move must use the shared proposal_config")
         self.prior_config = prior_config
         self.proposal_config = proposal_config
         self.calculations = calculations
