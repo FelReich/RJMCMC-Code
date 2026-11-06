@@ -1,0 +1,1398 @@
+{
+  "case": "A_simple_on_simple",
+  "generating_model": "simple",
+  "inference_graph_space": "simple",
+  "n_samples": 100,
+  "n_iterations": 1000000,
+  "burn_in": 500000,
+  "retained_per_chain": 500000,
+  "data_seed": 24680,
+  "chain_seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "prior_settings": {
+    "lambda_p": 3.0,
+    "s_r": 1.0,
+    "mu_eta": 0.0,
+    "s_eta": 0.75,
+    "tau": 1.0,
+    "m_0": 0.0,
+    "s_mu": 1.0
+  },
+  "proposal_settings": {
+    "sigma_r": 0.15,
+    "sigma_eta": 0.12,
+    "sigma_b": 0.3,
+    "gamma": 0.5,
+    "move_weights": {
+      "mean": 1.0,
+      "contrast": 1.0,
+      "margin": 1.0,
+      "coefficient": 1.0,
+      "reversal": 1.0,
+      "birth": 1.0,
+      "death": 1.0
+    }
+  },
+  "generating_M": [
+    [
+      -1.5,
+      0.0,
+      0.0
+    ],
+    [
+      0.5,
+      -1.5,
+      0.0
+    ],
+    [
+      0.6,
+      0.0,
+      -1.0
+    ]
+  ],
+  "generating_sigma": [
+    [
+      0.6666666666666666,
+      0.1111111111111111,
+      0.15999999999999998
+    ],
+    [
+      0.1111111111111111,
+      0.7037037037037037,
+      0.058666666666666666
+    ],
+    [
+      0.15999999999999998,
+      0.058666666666666666,
+      1.096
+    ]
+  ],
+  "generating_K": [
+    [
+      0.0,
+      -0.16666666666666666,
+      -0.23999999999999996
+    ],
+    [
+      0.16666666666666666,
+      0.0,
+      -0.00800000000000001
+    ],
+    [
+      0.24,
+      0.008,
+      0.0
+    ]
+  ],
+  "generating_edges": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ]
+  ],
+  "generating_spectral_abscissa": -1.0,
+  "generating_min_covariance_eigenvalue": 0.5567369149015736,
+  "generating_relative_lyapunov_residual": 5.863984045410237e-18,
+  "prior_graph_size_probabilities": [
+    0.07692307692307693,
+    0.23076923076923078,
+    0.3461538461538462,
+    0.3461538461538462
+  ],
+  "posterior_graph_size_probabilities": [
+    2.64e-05,
+    0.0062564,
+    0.3757812,
+    0.617936
+  ],
+  "posterior_mean_k": 2.6116268,
+  "posterior_k_95_percent_credible_interval": [
+    2.0,
+    3.0
+  ],
+  "true_graph_posterior_probability": 0.1542312,
+  "edge_inclusion_probabilities": {
+    "1->2": 0.544234,
+    "1->3": 0.547626,
+    "2->1": 0.4443868,
+    "2->3": 0.3761084,
+    "3->1": 0.3792456,
+    "3->2": 0.320026
+  },
+  "top_ten_graphs": [
+    {
+      "graph": "1\u21922, 1\u21923",
+      "draws": 385578,
+      "probability": 0.1542312
+    },
+    {
+      "graph": "1\u21923, 2\u21921, 3\u21922",
+      "draws": 230511,
+      "probability": 0.0922044
+    },
+    {
+      "graph": "1\u21923, 2\u21921, 2\u21923",
+      "draws": 220175,
+      "probability": 0.08807
+    },
+    {
+      "graph": "1\u21922, 2\u21923, 3\u21921",
+      "draws": 216506,
+      "probability": 0.0866024
+    },
+    {
+      "graph": "1\u21922, 1\u21923, 2\u21923",
+      "draws": 198571,
+      "probability": 0.0794284
+    },
+    {
+      "graph": "1\u21922, 3\u21921, 3\u21922",
+      "draws": 191548,
+      "probability": 0.0766192
+    },
+    {
+      "graph": "1\u21922, 3\u21921",
+      "draws": 170676,
+      "probability": 0.0682704
+    },
+    {
+      "graph": "1\u21923, 2\u21921",
+      "draws": 165838,
+      "probability": 0.0663352
+    },
+    {
+      "graph": "1\u21922, 1\u21923, 3\u21922",
+      "draws": 163680,
+      "probability": 0.065472
+    },
+    {
+      "graph": "2\u21921, 2\u21923, 3\u21921",
+      "draws": 162174,
+      "probability": 0.0648696
+    }
+  ],
+  "distinct_graphs": 27,
+  "graph_changes_per_retained_iteration": 0.0263136,
+  "empirical_covariance": [
+    [
+      0.806433792340347,
+      0.31440724522586855,
+      0.2811797049467743
+    ],
+    [
+      0.31440724522586855,
+      0.9150690715800811,
+      0.23836085842194596
+    ],
+    [
+      0.2811797049467743,
+      0.23836085842194596,
+      1.0175318083331026
+    ]
+  ],
+  "posterior_mean_covariance": [
+    [
+      0.8225926019106368,
+      0.3041056954789137,
+      0.2668853283744452
+    ],
+    [
+      0.3041056954789137,
+      0.932169562784091,
+      0.21495090029186
+    ],
+    [
+      0.2668853283744452,
+      0.21495090029186,
+      1.0404095796611967
+    ]
+  ],
+  "posterior_covariance_interval": [
+    [
+      [
+        0.6236712925979216,
+        0.1320261833463267,
+        0.06540231938243042
+      ],
+      [
+        0.1320261833463267,
+        0.7050093152949912,
+        0.025264362254062662
+      ],
+      [
+        0.06540231938243042,
+        0.025264362254062662,
+        0.7866646924207702
+      ]
+    ],
+    [
+      [
+        1.085199871348276,
+        0.5019811824506336,
+        0.476647577133801
+      ],
+      [
+        0.5019811824506336,
+        1.2314456031023633,
+        0.43684727065201107
+      ],
+      [
+        0.476647577133801,
+        0.43684727065201107,
+        1.3736026113337527
+      ]
+    ]
+  ],
+  "posterior_covariance_frobenius_error": 0.4751758940372994,
+  "empirical_covariance_frobenius_error": 0.496965902688729,
+  "posterior_mean_drift": [
+    [
+      -1.4716798312820223,
+      0.3726901515220725,
+      0.22464640344663733
+    ],
+    [
+      0.5185422680950799,
+      -1.3101071009542358,
+      0.11607178229316695
+    ],
+    [
+      0.41452981807284583,
+      0.15648074660525071,
+      -1.1439446697038635
+    ]
+  ],
+  "posterior_drift_interval": [
+    [
+      [
+        -2.042744488172488,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.8256595595860472,
+        -0.033895253693877
+      ],
+      [
+        0.0,
+        -0.06494675344872262,
+        -1.5655622006282977
+      ]
+    ],
+    [
+      [
+        -0.9981038984542472,
+        1.2958589225042223,
+        0.9799100079761274
+      ],
+      [
+        1.49574396429604,
+        -0.8821271005198805,
+        0.7421387923101399
+      ],
+      [
+        1.2989773113563667,
+        0.8747893198122128,
+        -0.794718372760275
+      ]
+    ]
+  ],
+  "posterior_drift_frobenius_error": 0.5653735538707829,
+  "between_chain_sd_of_mean_drift": [
+    [
+      0.006417938766949384,
+      0.01354948738404488,
+      0.0058538535468161835
+    ],
+    [
+      0.017323943875803893,
+      0.0066559575902973905,
+      0.006430314686152384
+    ],
+    [
+      0.009065244386497062,
+      0.007479386933122867,
+      0.0034536273865402125
+    ]
+  ],
+  "posterior_mean_skew": [
+    [
+      5.7291948962756575e-18,
+      -0.05436550670766907,
+      -0.07783781978900442
+    ],
+    [
+      0.0543655067076691,
+      7.181188976801423e-18,
+      -0.021699872694079792
+    ],
+    [
+      0.07783781978900456,
+      0.021699872694079764,
+      6.923572826167401e-18
+    ]
+  ],
+  "posterior_skew_interval": [
+    [
+      [
+        -1.1102230246251565e-15,
+        -0.5169938704099399,
+        -0.48998669087837526
+      ],
+      [
+        -0.4514044348185903,
+        -8.881784197001252e-16,
+        -0.3834349377422472
+      ],
+      [
+        -0.37888625013019933,
+        -0.3320880002174138,
+        -8.881784197001252e-16
+      ]
+    ],
+    [
+      [
+        9.992007221626409e-16,
+        0.45140443481859027,
+        0.37888625013019933
+      ],
+      [
+        0.5169938704099402,
+        7.771561172376096e-16,
+        0.33208800021741364
+      ],
+      [
+        0.48998669087837515,
+        0.38343493774224713,
+        7.771561172376096e-16
+      ]
+    ]
+  ],
+  "chain_sampling_seconds": 733.2529943753034,
+  "chains": [
+    {
+      "chain_id": 1,
+      "seed": 101,
+      "initial_graph": "\u2205",
+      "initial_edges": [],
+      "runtime_seconds": 144.50391954137012,
+      "distinct_graphs": 27,
+      "graph_changes": 13139,
+      "graph_changes_per_retained_iteration": 0.026278,
+      "calculation_count": 800458,
+      "failed_calculations": 0,
+      "maximum_relative_lyapunov_residual": 1.468763813491912e-15,
+      "maximum_skew_symmetry_error": 9.325873406851315e-15,
+      "acceptance": {
+        "mean": {
+          "proposed": 174656,
+          "accepted": 174656,
+          "rate": 1.0,
+          "retained_proposed": 87251,
+          "retained_accepted": 87251
+        },
+        "contrast": {
+          "proposed": 174630,
+          "accepted": 90011,
+          "rate": 0.5154383553799462,
+          "retained_proposed": 86960,
+          "retained_accepted": 44927
+        },
+        "margin": {
+          "proposed": 174730,
+          "accepted": 105810,
+          "rate": 0.6055628684255708,
+          "retained_proposed": 87302,
+          "retained_accepted": 53054
+        },
+        "coefficient": {
+          "proposed": 150391,
+          "accepted": 63416,
+          "rate": 0.4216741693319414,
+          "retained_proposed": 75572,
+          "retained_accepted": 31937
+        },
+        "reversal": {
+          "proposed": 150179,
+          "accepted": 10532,
+          "rate": 0.07012964528995398,
+          "retained_proposed": 75554,
+          "retained_accepted": 5187
+        },
+        "birth": {
+          "proposed": 24578,
+          "accepted": 8133,
+          "rate": 0.33090568801367076,
+          "retained_proposed": 12082,
+          "retained_accepted": 3976
+        },
+        "death": {
+          "proposed": 150836,
+          "accepted": 8131,
+          "rate": 0.05390622928213424,
+          "retained_proposed": 75279,
+          "retained_accepted": 3976
+        }
+      }
+    },
+    {
+      "chain_id": 2,
+      "seed": 202,
+      "initial_graph": "1\u21922",
+      "initial_edges": [
+        [
+          0,
+          1
+        ]
+      ],
+      "runtime_seconds": 154.2084317500703,
+      "distinct_graphs": 26,
+      "graph_changes": 12845,
+      "graph_changes_per_retained_iteration": 0.02569,
+      "calculation_count": 800526,
+      "failed_calculations": 0,
+      "maximum_relative_lyapunov_residual": 1.603572898347503e-15,
+      "maximum_skew_symmetry_error": 8.881784197001252e-15,
+      "acceptance": {
+        "mean": {
+          "proposed": 174751,
+          "accepted": 174751,
+          "rate": 1.0,
+          "retained_proposed": 87135,
+          "retained_accepted": 87135
+        },
+        "contrast": {
+          "proposed": 175630,
+          "accepted": 90660,
+          "rate": 0.5161988270796561,
+          "retained_proposed": 87557,
+          "retained_accepted": 45511
+        },
+        "margin": {
+          "proposed": 174875,
+          "accepted": 105491,
+          "rate": 0.6032365975696926,
+          "retained_proposed": 87436,
+          "retained_accepted": 53031
+        },
+        "coefficient": {
+          "proposed": 150099,
+          "accepted": 63084,
+          "rate": 0.4202826134751064,
+          "retained_proposed": 75373,
+          "retained_accepted": 31703
+        },
+        "reversal": {
+          "proposed": 150523,
+          "accepted": 10328,
+          "rate": 0.06861409884203742,
+          "retained_proposed": 75662,
+          "retained_accepted": 5150
+        },
+        "birth": {
+          "proposed": 24335,
+          "accepted": 7890,
+          "rate": 0.32422436819395933,
+          "retained_proposed": 11840,
+          "retained_accepted": 3847
+        },
+        "death": {
+          "proposed": 149787,
+          "accepted": 7889,
+          "rate": 0.052668122066668,
+          "retained_proposed": 74997,
+          "retained_accepted": 3848
+        }
+      }
+    },
+    {
+      "chain_id": 3,
+      "seed": 303,
+      "initial_graph": "1\u21922, 1\u21923",
+      "initial_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "runtime_seconds": 147.6487278752029,
+      "distinct_graphs": 25,
+      "graph_changes": 12978,
+      "graph_changes_per_retained_iteration": 0.025956,
+      "calculation_count": 800348,
+      "failed_calculations": 0,
+      "maximum_relative_lyapunov_residual": 1.4770575958082854e-15,
+      "maximum_skew_symmetry_error": 9.325873406851315e-15,
+      "acceptance": {
+        "mean": {
+          "proposed": 174865,
+          "accepted": 174865,
+          "rate": 1.0,
+          "retained_proposed": 87227,
+          "retained_accepted": 87227
+        },
+        "contrast": {
+          "proposed": 174968,
+          "accepted": 90057,
+          "rate": 0.5147055461570116,
+          "retained_proposed": 87039,
+          "retained_accepted": 44827
+        },
+        "margin": {
+          "proposed": 175216,
+          "accepted": 106585,
+          "rate": 0.6083063190576203,
+          "retained_proposed": 88048,
+          "retained_accepted": 53736
+        },
+        "coefficient": {
+          "proposed": 150157,
+          "accepted": 62686,
+          "rate": 0.41746971503160024,
+          "retained_proposed": 75349,
+          "retained_accepted": 31185
+        },
+        "reversal": {
+          "proposed": 150186,
+          "accepted": 10267,
+          "rate": 0.06836189791325423,
+          "retained_proposed": 75214,
+          "retained_accepted": 5095
+        },
+        "birth": {
+          "proposed": 24512,
+          "accepted": 7918,
+          "rate": 0.32302545691906004,
+          "retained_proposed": 12225,
+          "retained_accepted": 3941
+        },
+        "death": {
+          "proposed": 150096,
+          "accepted": 7918,
+          "rate": 0.05275290480758981,
+          "retained_proposed": 74898,
+          "retained_accepted": 3942
+        }
+      }
+    },
+    {
+      "chain_id": 4,
+      "seed": 404,
+      "initial_graph": "2\u21921, 3\u21922",
+      "initial_edges": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "runtime_seconds": 143.70523783378303,
+      "distinct_graphs": 26,
+      "graph_changes": 13616,
+      "graph_changes_per_retained_iteration": 0.027232,
+      "calculation_count": 800206,
+      "failed_calculations": 0,
+      "maximum_relative_lyapunov_residual": 1.478449684661128e-15,
+      "maximum_skew_symmetry_error": 9.325873406851315e-15,
+      "acceptance": {
+        "mean": {
+          "proposed": 174994,
+          "accepted": 174994,
+          "rate": 1.0,
+          "retained_proposed": 87430,
+          "retained_accepted": 87430
+        },
+        "contrast": {
+          "proposed": 175002,
+          "accepted": 90313,
+          "rate": 0.5160683877898539,
+          "retained_proposed": 87780,
+          "retained_accepted": 45263
+        },
+        "margin": {
+          "proposed": 174820,
+          "accepted": 105490,
+          "rate": 0.603420661251573,
+          "retained_proposed": 87418,
+          "retained_accepted": 52735
+        },
+        "coefficient": {
+          "proposed": 150458,
+          "accepted": 63297,
+          "rate": 0.4206954764784857,
+          "retained_proposed": 74963,
+          "retained_accepted": 31563
+        },
+        "reversal": {
+          "proposed": 149835,
+          "accepted": 10570,
+          "rate": 0.07054426535856108,
+          "retained_proposed": 74939,
+          "retained_accepted": 5297
+        },
+        "birth": {
+          "proposed": 24957,
+          "accepted": 8117,
+          "rate": 0.3252394117882758,
+          "retained_proposed": 12814,
+          "retained_accepted": 4159
+        },
+        "death": {
+          "proposed": 149934,
+          "accepted": 8117,
+          "rate": 0.054137153680952954,
+          "retained_proposed": 74656,
+          "retained_accepted": 4160
+        }
+      }
+    },
+    {
+      "chain_id": 5,
+      "seed": 505,
+      "initial_graph": "1\u21922, 1\u21923, 2\u21923",
+      "initial_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "runtime_seconds": 143.18667737487704,
+      "distinct_graphs": 26,
+      "graph_changes": 13206,
+      "graph_changes_per_retained_iteration": 0.026412,
+      "calculation_count": 799930,
+      "failed_calculations": 0,
+      "maximum_relative_lyapunov_residual": 1.590397452317788e-15,
+      "maximum_skew_symmetry_error": 9.769962616701378e-15,
+      "acceptance": {
+        "mean": {
+          "proposed": 175118,
+          "accepted": 175118,
+          "rate": 1.0,
+          "retained_proposed": 87670,
+          "retained_accepted": 87670
+        },
+        "contrast": {
+          "proposed": 174565,
+          "accepted": 90440,
+          "rate": 0.5180878182911809,
+          "retained_proposed": 87226,
+          "retained_accepted": 45431
+        },
+        "margin": {
+          "proposed": 175544,
+          "accepted": 106078,
+          "rate": 0.6042815476461741,
+          "retained_proposed": 87515,
+          "retained_accepted": 52945
+        },
+        "coefficient": {
+          "proposed": 149966,
+          "accepted": 62857,
+          "rate": 0.4191416721123455,
+          "retained_proposed": 74991,
+          "retained_accepted": 31405
+        },
+        "reversal": {
+          "proposed": 150378,
+          "accepted": 10532,
+          "rate": 0.07003684049528522,
+          "retained_proposed": 75097,
+          "retained_accepted": 5238
+        },
+        "birth": {
+          "proposed": 24843,
+          "accepted": 8081,
+          "rate": 0.32528277583222637,
+          "retained_proposed": 12329,
+          "retained_accepted": 3984
+        },
+        "death": {
+          "proposed": 149586,
+          "accepted": 8082,
+          "rate": 0.054029120372227346,
+          "retained_proposed": 75172,
+          "retained_accepted": 3984
+        }
+      }
+    }
+  ],
+  "diagnostics": [
+    {
+      "quantity": "k",
+      "rhat": 1.0003122194048841,
+      "rank_split_rhat": 1.0003122194048841,
+      "folded_rank_split_rhat": 1.0003122194048841,
+      "minimum_single_chain_ess": 2450.3658399578894,
+      "summed_approximate_ess": 13675.675706397122,
+      "approximate_ess_per_second": 18.650691932118388,
+      "single_chain_ess": [
+        2906.786798510346,
+        2539.6794830755152,
+        2450.3658399578894,
+        2874.579343501624,
+        2904.2642413517474
+      ],
+      "chain_means": [
+        2.620752,
+        2.623616,
+        2.610624,
+        2.597852,
+        2.60529
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "log_likelihood",
+      "rhat": 1.0000644447480735,
+      "rank_split_rhat": 1.0000644447480735,
+      "folded_rank_split_rhat": 1.0000601634571717,
+      "minimum_single_chain_ess": 6590.943877704941,
+      "summed_approximate_ess": 36115.16636502271,
+      "approximate_ess_per_second": 49.253349992509904,
+      "single_chain_ess": [
+        6590.943877704941,
+        8023.391953951768,
+        8050.577921610029,
+        6595.854507141608,
+        6854.398104614363
+      ],
+      "chain_means": [
+        -126.84094528951475,
+        -126.82874403299323,
+        -126.85360917002076,
+        -126.86416637289513,
+        -126.86040813052783
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "eta",
+      "rhat": 1.0009316195956375,
+      "rank_split_rhat": 1.000803076082428,
+      "folded_rank_split_rhat": 1.0009316195956375,
+      "minimum_single_chain_ess": 628.0706569717224,
+      "summed_approximate_ess": 3782.256900968945,
+      "approximate_ess_per_second": 5.158188142404039,
+      "single_chain_ess": [
+        784.8136224547538,
+        735.6897084443766,
+        628.0706569717224,
+        744.6281312680492,
+        889.0547818300429
+      ],
+      "chain_means": [
+        0.9921886093872962,
+        0.9915831144721098,
+        0.9939480640054336,
+        0.9994241255326862,
+        0.996116726907038
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_1_to_2",
+      "rhat": 1.0010729416364454,
+      "rank_split_rhat": 1.0010729416364454,
+      "folded_rank_split_rhat": 1.0010729416364454,
+      "minimum_single_chain_ess": 486.6896044714358,
+      "summed_approximate_ess": 2929.0704584334358,
+      "approximate_ess_per_second": 3.9946246123807025,
+      "single_chain_ess": [
+        648.599851948534,
+        628.9889569695872,
+        486.6896044714358,
+        554.907999131274,
+        609.8840459126046
+      ],
+      "chain_means": [
+        0.541262,
+        0.535876,
+        0.564396,
+        0.55818,
+        0.521456
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_1_to_3",
+      "rhat": 1.001004079068934,
+      "rank_split_rhat": 1.001004079068934,
+      "folded_rank_split_rhat": 1.001004079068934,
+      "minimum_single_chain_ess": 829.9789976780553,
+      "summed_approximate_ess": 4823.880616957095,
+      "approximate_ess_per_second": 6.578739744618175,
+      "single_chain_ess": [
+        1022.805283780914,
+        869.9308769747041,
+        829.9789976780553,
+        1045.8994725657353,
+        1055.2659859576863
+      ],
+      "chain_means": [
+        0.534418,
+        0.55881,
+        0.54498,
+        0.543328,
+        0.556594
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_2_to_1",
+      "rhat": 1.000999631170812,
+      "rank_split_rhat": 1.000999631170812,
+      "folded_rank_split_rhat": 1.000999631170812,
+      "minimum_single_chain_ess": 475.2112846430417,
+      "summed_approximate_ess": 2919.812104001685,
+      "approximate_ess_per_second": 3.9819982003472427,
+      "single_chain_ess": [
+        640.7562173318751,
+        625.7969580178892,
+        475.2112846430417,
+        565.732129148573,
+        612.3155148603062
+      ],
+      "chain_means": [
+        0.447652,
+        0.454666,
+        0.426526,
+        0.428158,
+        0.464932
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_2_to_3",
+      "rhat": 1.000916343389981,
+      "rank_split_rhat": 1.000916343389981,
+      "folded_rank_split_rhat": 1.000916343389981,
+      "minimum_single_chain_ess": 1553.1844521169978,
+      "summed_approximate_ess": 8295.62537148075,
+      "approximate_ess_per_second": 11.313455840092718,
+      "single_chain_ess": [
+        1634.743675765393,
+        1833.3862881342752,
+        1553.1844521169978,
+        1557.3455724832254,
+        1716.9653829808585
+      ],
+      "chain_means": [
+        0.394564,
+        0.369318,
+        0.382064,
+        0.377864,
+        0.356732
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_3_to_1",
+      "rhat": 1.000804193740901,
+      "rank_split_rhat": 1.000804193740901,
+      "folded_rank_split_rhat": 1.000804193740901,
+      "minimum_single_chain_ess": 857.4275918344214,
+      "summed_approximate_ess": 4917.093626844567,
+      "approximate_ess_per_second": 6.70586232114019,
+      "single_chain_ess": [
+        977.6328101025554,
+        857.4275918344214,
+        896.4437053598431,
+        1101.1711993119047,
+        1084.4183202358424
+      ],
+      "chain_means": [
+        0.391434,
+        0.371764,
+        0.384176,
+        0.379136,
+        0.369718
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "edge_3_to_2",
+      "rhat": 1.0009563083643689,
+      "rank_split_rhat": 1.0009563083643689,
+      "folded_rank_split_rhat": 1.0009563083643689,
+      "minimum_single_chain_ess": 1270.5716149628804,
+      "summed_approximate_ess": 7339.790313455964,
+      "approximate_ess_per_second": 10.00990158889036,
+      "single_chain_ess": [
+        1270.5716149628804,
+        1539.9366240157951,
+        1303.3193502043273,
+        1773.2963366629763,
+        1452.666387609985
+      ],
+      "chain_means": [
+        0.311422,
+        0.333182,
+        0.308482,
+        0.311186,
+        0.335858
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_1_1",
+      "rhat": 1.000280978818552,
+      "rank_split_rhat": 1.000280978818552,
+      "folded_rank_split_rhat": 1.0001932901452355,
+      "minimum_single_chain_ess": 1016.1694060445768,
+      "summed_approximate_ess": 5761.813722533054,
+      "approximate_ess_per_second": 7.857879567804349,
+      "single_chain_ess": [
+        1202.2389667773598,
+        1197.05862782306,
+        1066.6689477793818,
+        1016.1694060445768,
+        1279.677774108675
+      ],
+      "chain_means": [
+        -1.4752505647522542,
+        -1.471280496847662,
+        -1.4666503218166935,
+        -1.464708636693365,
+        -1.4805091363001315
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_1_2",
+      "rhat": 1.0007392403664745,
+      "rank_split_rhat": 1.0007318323100636,
+      "folded_rank_split_rhat": 1.0007392403664745,
+      "minimum_single_chain_ess": 506.83420677977114,
+      "summed_approximate_ess": 3148.2458082376825,
+      "approximate_ess_per_second": 4.2935328357163245,
+      "single_chain_ess": [
+        702.1181953229172,
+        656.6056546842841,
+        506.83420677977114,
+        593.7629542078902,
+        688.9247972428199
+      ],
+      "chain_means": [
+        0.37400291197766516,
+        0.38069617124080357,
+        0.3615932434393435,
+        0.35708963538273053,
+        0.39006879556931123
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_1_3",
+      "rhat": 1.0007870583393035,
+      "rank_split_rhat": 1.000653235295131,
+      "folded_rank_split_rhat": 1.0007870583393035,
+      "minimum_single_chain_ess": 902.4987995166113,
+      "summed_approximate_ess": 5208.81448772805,
+      "approximate_ess_per_second": 7.103707080208669,
+      "single_chain_ess": [
+        979.7160602865683,
+        902.4987995166113,
+        981.4244411053668,
+        1235.7987381022965,
+        1109.3764487172077
+      ],
+      "chain_means": [
+        0.23391297376872563,
+        0.2221358291374871,
+        0.22675619412751336,
+        0.21945661085677584,
+        0.22097040934267362
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_1_1",
+      "rhat": 1.0001673368021515,
+      "rank_split_rhat": 1.0001673368021515,
+      "folded_rank_split_rhat": 1.0000336798163432,
+      "minimum_single_chain_ess": 7183.269599005198,
+      "summed_approximate_ess": 39149.65794110716,
+      "approximate_ess_per_second": 53.391746425066835,
+      "single_chain_ess": [
+        7943.088000175907,
+        7799.5420388528855,
+        8122.542054176971,
+        7183.269599005198,
+        8101.216248896199
+      ],
+      "chain_means": [
+        0.8232849045050865,
+        0.8237751931500286,
+        0.8234890404223836,
+        0.8212677164267516,
+        0.8211461550486973
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_1_2",
+      "rhat": 1.000231705036597,
+      "rank_split_rhat": 1.000231705036597,
+      "folded_rank_split_rhat": 1.0000457135861969,
+      "minimum_single_chain_ess": 4103.559608988433,
+      "summed_approximate_ess": 21929.150352036395,
+      "approximate_ess_per_second": 29.906663212086826,
+      "single_chain_ess": [
+        4555.087170639746,
+        4103.559608988433,
+        4465.279724566598,
+        4445.533564538953,
+        4359.690283302664
+      ],
+      "chain_means": [
+        0.30376554074667156,
+        0.3036004861215813,
+        0.30523679332973147,
+        0.3034175511398685,
+        0.30450810605644446
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "K_1_2",
+      "rhat": 1.0006564548297152,
+      "rank_split_rhat": 1.000612224411212,
+      "folded_rank_split_rhat": 1.0006564548297152,
+      "minimum_single_chain_ess": 494.17808466125285,
+      "summed_approximate_ess": 2930.2580437655674,
+      "approximate_ess_per_second": 3.996244224358071,
+      "single_chain_ess": [
+        650.1879171748678,
+        624.981892960833,
+        494.17808466125285,
+        550.6745908609221,
+        610.2355581076918
+      ],
+      "chain_means": [
+        -0.05100858894709155,
+        -0.04763025988483118,
+        -0.06516923522819679,
+        -0.06581648990377982,
+        -0.042202959574444546
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_1_3",
+      "rhat": 1.000170028948461,
+      "rank_split_rhat": 1.000170028948461,
+      "folded_rank_split_rhat": 1.0001688743939197,
+      "minimum_single_chain_ess": 3607.58843525307,
+      "summed_approximate_ess": 20062.944593728043,
+      "approximate_ess_per_second": 27.361558353840362,
+      "single_chain_ess": [
+        4165.255797170377,
+        4277.993793276874,
+        3607.58843525307,
+        3818.1041424074297,
+        4194.0024256202905
+      ],
+      "chain_means": [
+        0.26834201542558705,
+        0.2684046766065145,
+        0.2662493617113855,
+        0.26509593203720616,
+        0.26633465609168616
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "K_1_3",
+      "rhat": 1.0006579080992233,
+      "rank_split_rhat": 1.0006579080992233,
+      "folded_rank_split_rhat": 1.0003768506080033,
+      "minimum_single_chain_ess": 861.380488060165,
+      "summed_approximate_ess": 4736.135655462868,
+      "approximate_ess_per_second": 6.459074414687976,
+      "single_chain_ess": [
+        941.8506040195219,
+        861.380488060165,
+        865.0995622689934,
+        1031.6650743961632,
+        1036.139926718025
+      ],
+      "chain_means": [
+        -0.069845930404732,
+        -0.08247812041008946,
+        -0.07653713093503052,
+        -0.08112782439932321,
+        -0.07920009279590486
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_2_1",
+      "rhat": 1.0008779126180527,
+      "rank_split_rhat": 1.0008779126180527,
+      "folded_rank_split_rhat": 1.0004691233595333,
+      "minimum_single_chain_ess": 576.2966727135026,
+      "summed_approximate_ess": 3144.0879786818423,
+      "approximate_ess_per_second": 4.28786244693137,
+      "single_chain_ess": [
+        679.8566553399396,
+        665.8631944206512,
+        596.4591396566469,
+        576.2966727135026,
+        625.6123165511018
+      ],
+      "chain_means": [
+        0.5131961279589721,
+        0.5058639175037942,
+        0.5379270812737057,
+        0.5356730321264578,
+        0.5000511816125681
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_2_2",
+      "rhat": 1.0004498461004796,
+      "rank_split_rhat": 1.0004498461004796,
+      "folded_rank_split_rhat": 1.0002499657959503,
+      "minimum_single_chain_ess": 1005.0621639107877,
+      "summed_approximate_ess": 5395.841268907845,
+      "approximate_ess_per_second": 7.35877154310818,
+      "single_chain_ess": [
+        1145.0313344894316,
+        1039.016056894505,
+        1016.6069510327682,
+        1005.0621639107877,
+        1190.1247625803528
+      ],
+      "chain_means": [
+        -1.3078263765993463,
+        -1.3049801371080536,
+        -1.3168312619443192,
+        -1.3175295311297504,
+        -1.3033681979885348
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_2_3",
+      "rhat": 1.0009719633014822,
+      "rank_split_rhat": 1.0009719633014822,
+      "folded_rank_split_rhat": 1.0009625980005925,
+      "minimum_single_chain_ess": 1146.5474473903264,
+      "summed_approximate_ess": 6775.443176676978,
+      "approximate_ess_per_second": 9.240252994056073,
+      "single_chain_ess": [
+        1146.5474473903264,
+        1539.9465094699256,
+        1261.0750524554849,
+        1502.8955489619261,
+        1324.9786183993142
+      ],
+      "chain_means": [
+        0.11477132679968961,
+        0.11792397847856226,
+        0.10788308030860323,
+        0.11423086617089995,
+        0.12554965970800622
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_2_2",
+      "rhat": 1.000079999314909,
+      "rank_split_rhat": 1.000079999314909,
+      "folded_rank_split_rhat": 1.0000290959856517,
+      "minimum_single_chain_ess": 7316.20010520292,
+      "summed_approximate_ess": 41001.90317740935,
+      "approximate_ess_per_second": 55.917812122050755,
+      "single_chain_ess": [
+        8553.946943768671,
+        8054.500197765119,
+        8228.444034244714,
+        7316.20010520292,
+        8848.811896427926
+      ],
+      "chain_means": [
+        0.9323591922748894,
+        0.9324861381866181,
+        0.9304581600874616,
+        0.9315204505010224,
+        0.934023872870253
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_2_3",
+      "rhat": 1.0003281084768052,
+      "rank_split_rhat": 1.0003281084768052,
+      "folded_rank_split_rhat": 1.0001196773181664,
+      "minimum_single_chain_ess": 3946.710723404135,
+      "summed_approximate_ess": 20401.674887271638,
+      "approximate_ess_per_second": 27.823513908256036,
+      "single_chain_ess": [
+        4062.9927916513493,
+        4048.7521325497764,
+        3946.710723404135,
+        4338.223402761406,
+        4004.9958369049723
+      ],
+      "chain_means": [
+        0.2171379975528033,
+        0.2139697469123382,
+        0.21400570993305282,
+        0.2149575924486424,
+        0.21468345461247582
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "K_2_3",
+      "rhat": 1.0006683568192651,
+      "rank_split_rhat": 1.0004623011033362,
+      "folded_rank_split_rhat": 1.0006683568192651,
+      "minimum_single_chain_ess": 1237.7606659950843,
+      "summed_approximate_ess": 7183.419851147723,
+      "approximate_ess_per_second": 9.796645777447734,
+      "single_chain_ess": [
+        1315.7157607328447,
+        1516.8561623026176,
+        1237.7606659950843,
+        1644.4022477047072,
+        1468.6850144124694
+      ],
+      "chain_means": [
+        -0.025047542394529686,
+        -0.021009631875190383,
+        -0.025061047495324063,
+        -0.020791176323456756,
+        -0.01658996538189403
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_3_1",
+      "rhat": 1.0007606283947417,
+      "rank_split_rhat": 1.0007606283947417,
+      "folded_rank_split_rhat": 1.0002170638165362,
+      "minimum_single_chain_ess": 819.0594727801433,
+      "summed_approximate_ess": 4814.934248238802,
+      "approximate_ess_per_second": 6.566538814261367,
+      "single_chain_ess": [
+        1000.057779192195,
+        927.542488376331,
+        819.0594727801433,
+        1015.0300551086019,
+        1053.244452781531
+      ],
+      "chain_means": [
+        0.40134636076215424,
+        0.42550580161092705,
+        0.4106027722306956,
+        0.41791410103215537,
+        0.4172800547284838
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_3_2",
+      "rhat": 1.0010916914006507,
+      "rank_split_rhat": 1.0009005317796857,
+      "folded_rank_split_rhat": 1.0010916914006507,
+      "minimum_single_chain_ess": 1151.6660034206725,
+      "summed_approximate_ess": 6848.264526110226,
+      "approximate_ess_per_second": 9.339565714211124,
+      "single_chain_ess": [
+        1355.3622070436866,
+        1485.1840077587474,
+        1151.6660034206725,
+        1528.3728746137756,
+        1327.6794332733436
+      ],
+      "chain_means": [
+        0.16738583661924006,
+        0.1524628606864623,
+        0.1602481089371784,
+        0.15413235649971482,
+        0.1481745702837169
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "M_3_3",
+      "rhat": 1.000210657943486,
+      "rank_split_rhat": 1.000210657943486,
+      "folded_rank_split_rhat": 1.0000641531455454,
+      "minimum_single_chain_ess": 1374.0382850027565,
+      "summed_approximate_ess": 8480.213035129724,
+      "approximate_ess_per_second": 11.565193869210805,
+      "single_chain_ess": [
+        1659.0213824035939,
+        1807.194652284807,
+        1374.0382850027565,
+        1698.3772227644195,
+        1941.5814926741466
+      ],
+      "chain_means": [
+        -1.1401079404471233,
+        -1.1495135648904098,
+        -1.1441703822707483,
+        -1.1428968347139825,
+        -1.1430346261965716
+      ],
+      "flag": false
+    },
+    {
+      "quantity": "Sigma_3_3",
+      "rhat": 1.0002768450881903,
+      "rank_split_rhat": 1.0002768450881903,
+      "folded_rank_split_rhat": 1.0000277597807081,
+      "minimum_single_chain_ess": 6188.98611307117,
+      "summed_approximate_ess": 35644.72476182583,
+      "approximate_ess_per_second": 48.6117684281582,
+      "single_chain_ess": [
+        6188.98611307117,
+        8195.858051641128,
+        6739.7841110032605,
+        6645.139529635468,
+        7874.956956474809
+      ],
+      "chain_means": [
+        1.0428823908788587,
+        1.0370925199994017,
+        1.0401625033953612,
+        1.041958422685727,
+        1.0399520613464295
+      ],
+      "flag": false
+    }
+  ],
+  "flagged_quantities": [],
+  "diagnostic_flag_rule": "R-hat > 1.05 or minimum single-chain approximate ESS < 100",
+  "ess_method": "FFT autocorrelation, initial positive pairs, per-chain approximate ESS"
+}

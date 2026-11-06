@@ -1,0 +1,50 @@
+{
+  "experiments": [
+    {
+      "experiment": "A_simple_on_simple",
+      "inference_graph_space": "simple",
+      "posterior_mean_k": 2.6116268,
+      "true_graph_posterior_probability": 0.1542312,
+      "posterior_covariance_frobenius_error": 0.4751758940372994,
+      "empirical_covariance_frobenius_error": 0.496965902688729,
+      "posterior_drift_frobenius_error": 0.5653735538707829,
+      "maximum_M_rhat": 1.0010916914006507,
+      "minimum_M_single_chain_ess": 506.83420677977114,
+      "maximum_Sigma_rhat": 1.0003281084768052,
+      "minimum_Sigma_single_chain_ess": 3607.58843525307,
+      "graph_changes_per_retained_iteration": 0.0263136,
+      "chain_sampling_seconds": 733.2529943753034
+    },
+    {
+      "experiment": "B_general_on_simple",
+      "inference_graph_space": "general",
+      "posterior_mean_k": 3.5684244,
+      "true_graph_posterior_probability": 0.081682,
+      "posterior_covariance_frobenius_error": 0.4779250651459346,
+      "empirical_covariance_frobenius_error": 0.496965902688729,
+      "posterior_drift_frobenius_error": 0.5611766835652743,
+      "maximum_M_rhat": 1.0039437299527536,
+      "minimum_M_single_chain_ess": 207.22949836297408,
+      "maximum_Sigma_rhat": 1.0002961958641805,
+      "minimum_Sigma_single_chain_ess": 2741.996900755148,
+      "graph_changes_per_retained_iteration": 0.0438632,
+      "chain_sampling_seconds": 729.8094129175879
+    },
+    {
+      "experiment": "C_general_on_nonsimple",
+      "inference_graph_space": "general",
+      "posterior_mean_k": 2.2776548,
+      "true_graph_posterior_probability": 0.0088656,
+      "posterior_covariance_frobenius_error": 0.368128287958432,
+      "empirical_covariance_frobenius_error": 0.3853225154595343,
+      "posterior_drift_frobenius_error": 0.9893988952462297,
+      "maximum_M_rhat": 1.0028046593240592,
+      "minimum_M_single_chain_ess": 333.135938449145,
+      "maximum_Sigma_rhat": 1.0003099819025587,
+      "minimum_Sigma_single_chain_ess": 3357.867460315721,
+      "graph_changes_per_retained_iteration": 0.060998,
+      "chain_sampling_seconds": 754.5324475839734
+    }
+  ],
+  "note": "A and B use the same data and hyperparameters; the graph space changes the support and normalization of the graph prior."
+}
