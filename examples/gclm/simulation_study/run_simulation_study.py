@@ -8,6 +8,7 @@ From the Code repository root:
 
 Each output row is the state *after* the numbered update. Iterations are
 one-based, so a burn-in of 50,000 leaves iterations 50,001 through 100,000.
+Each completed chain is saved as results/<configuration_id>/chain_<number>.csv.
 Vertices are zero-based; edge (i, j) means source i, target j, and M[j, i].
 Bit i corresponds to the i-th edge column in lexicographic (source, target)
 order. A blank b_i_j means the edge is absent, not that its coefficient is 0.
@@ -21,10 +22,10 @@ Recording uses no additional random draws and does not change transitions.
 import argparse
 import csv
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
-import shutil
 import sys
 from time import perf_counter
 
@@ -41,14 +42,12 @@ from examples.gclm.gclm_moves import (
     BirthMove, CoefficientMove, ContrastMove, DeathMove, MarginMove,
     MeanMove, ReversalMove,
 )
-from examples.gclm.state import Graph
+from examples.gclm.state import Graph, State
 
 
 HERE = Path(__file__).resolve().parent
 SETTINGS_PATH = HERE / "settings" / "settings.csv"
-RESULT_PATH = HERE / "simulation_study_results.csv"
-SMOKE_PATH = HERE / "simulation_study_smoke.csv"
-PARTS_DIR = HERE / ".simulation_study_parts"
+RESULTS_DIR = HERE / "results"
 MOVE_CLASSES = {
     "mean": MeanMove,
     "contrast": ContrastMove,
@@ -236,7 +235,7 @@ def generate_datasets(models, datasets, mean, chosen_models):
 
 def run_chain(task, data, prior_values, proposal_values, move_order,
               n_iterations, burn_in, output, fieldnames, edges):
-    """Run one chain and stream every post-burn-in state to an incomplete file."""
+    """Run one chain and stream every post-burn-in state to an open CSV stream."""
     config_id, config, chain_number, seed = task
     prior = GCLMPriorConfig(graph_space=config["inference_graph_space"], **prior_values)
     proposal = GCLMProposalConfig(**proposal_values)
@@ -247,29 +246,26 @@ def run_chain(task, data, prior_values, proposal_values, move_order,
     }
     sampler = GCLM(moves, calculations, prior, proposal, seed=seed)
     retained = 0
-    with output.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file, lineterminator="\n")
-        writer.writerow(fieldnames)
-        for iteration in range(1, n_iterations + 1):
-            previous_graph = sampler.state.graph
-            state, move, accepted = sampler.step()
-            if iteration <= burn_in:
-                continue
-            if config["inference_graph_space"] == "simple" and not state.graph.is_simple:
-                raise RuntimeError("The sampler produced a graph outside the simple space")
-            writer.writerow(make_row(
-                task, iteration, move, accepted, previous_graph,
-                state, calculations, edges,
-            ))
-            retained += 1
-        file.flush()
-        os.fsync(file.fileno())
+    writer = csv.writer(output, lineterminator="\n")
+    writer.writerow(fieldnames)
+    for iteration in range(1, n_iterations + 1):
+        previous_graph = sampler.state.graph
+        state, move, accepted = sampler.step()
+        if iteration <= burn_in:
+            continue
+        if config["inference_graph_space"] == "simple" and not state.graph.is_simple:
+            raise RuntimeError("The sampler produced a graph outside the simple space")
+        writer.writerow(make_row(
+            task, iteration, move, accepted, previous_graph,
+            state, calculations, edges,
+        ))
+        retained += 1
     if retained != n_iterations - burn_in:
         raise RuntimeError(f"Wrong retained row count for {config_id} chain {chain_number}")
     return retained
 
 
-def verify_completed_part(path, task, fieldnames, n_iterations, burn_in):
+def verify_completed_chain(path, task, fieldnames, n_iterations, burn_in):
     """A completed chain must have the full header and consecutive iterations."""
     config_id, config, chain_number, seed = task
     with path.open(newline="", encoding="utf-8") as file:
@@ -281,6 +277,9 @@ def verify_completed_part(path, task, fieldnames, n_iterations, burn_in):
             expected_iteration = burn_in + count + 1
             if (None in row or any(value is None for value in row.values())
                     or row["configuration_id"] != config_id
+                    or row["generating_model"] != config["generating_model"]
+                    or row["n"] != str(config["n"])
+                    or row["inference_graph_space"] != config["inference_graph_space"]
                     or row["chain_number"] != str(chain_number)
                     or row["chain_seed"] != str(seed)
                     or row["dataset_seed"] != str(config["dataset_seed"])
@@ -293,54 +292,118 @@ def verify_completed_part(path, task, fieldnames, n_iterations, burn_in):
 
 def chain_file(task):
     config_id, _, chain_number, _ = task
-    return PARTS_DIR / f"{config_id}__chain_{chain_number:02d}.csv"
+    return RESULTS_DIR / config_id / f"chain_{chain_number}.csv"
 
 
-def prepare_parts(settings_hash, fieldnames, run, resume):
+def prepare_results(settings_hash, fieldnames, run, resume):
     """Tie resumable chain files to the exact settings and output schema."""
-    manifest_path = PARTS_DIR / "manifest.json"
+    manifest_path = RESULTS_DIR / "manifest.json"
     manifest = {
         "settings_sha256": settings_hash,
         "columns": fieldnames,
         "iterations_per_chain": run["iterations_per_chain"],
         "burn_in": run["burn_in"],
     }
-    if PARTS_DIR.exists():
+    if RESULTS_DIR.exists() and not RESULTS_DIR.is_dir():
+        raise ValueError(f"Results path is not a directory: {RESULTS_DIR}")
+    if manifest_path.exists():
         if not resume:
             raise FileExistsError(
-                f"{PARTS_DIR} exists; use --resume to continue an interrupted study"
+                f"Results already exist in {RESULTS_DIR}; use --resume to continue"
             )
-        if manifest_path.exists():
-            if json.loads(manifest_path.read_text(encoding="utf-8")) != manifest:
-                raise ValueError("Existing chain files do not match the current settings/schema")
-        elif any(PARTS_DIR.iterdir()):
-            raise ValueError("Chain files exist without a manifest; cannot resume safely")
-    else:
-        PARTS_DIR.mkdir()
+        if json.loads(manifest_path.read_text(encoding="utf-8")) != manifest:
+            raise ValueError("Existing chain files do not match the current settings/schema")
+    elif RESULTS_DIR.exists() and any(
+        path.is_file() and path.name != ".DS_Store" for path in RESULTS_DIR.rglob("*")
+    ):
+        raise ValueError("Result files exist without a manifest; cannot continue safely")
+    RESULTS_DIR.mkdir(exist_ok=True)
     if not manifest_path.exists():
         manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
-def consolidate(tasks, fieldnames):
-    """Build the final CSV atomically, without loading chain files into RAM."""
-    partial = RESULT_PATH.with_name(RESULT_PATH.name + ".partial")
-    expected_header = (",".join(fieldnames) + "\n").encode("utf-8")
-    with partial.open("wb") as destination:
-        destination.write(expected_header)
-        for task in tasks:
-            with chain_file(task).open("rb") as source:
-                if source.readline() != expected_header:
-                    raise ValueError(f"Wrong header in {chain_file(task)}")
-                shutil.copyfileobj(source, destination, length=1024 * 1024)
-        destination.flush()
-        os.fsync(destination.fileno())
-    if RESULT_PATH.exists():
-        raise FileExistsError(f"Completed result already exists: {RESULT_PATH}")
-    os.replace(partial, RESULT_PATH)
-    for task in tasks:
-        chain_file(task).unlink()
-    (PARTS_DIR / "manifest.json").unlink()
-    PARTS_DIR.rmdir()
+def verify_smoke_csv(text, task, data, fieldnames, edges):
+    """Parse the in-memory CSV and reconstruct every retained state."""
+    config_id, config, chain_number, seed = task
+    p = data.shape[1]
+    calculations = GCLMCalculations(data)
+    reader = csv.DictReader(io.StringIO(text))
+    if reader.fieldnames != fieldnames:
+        raise ValueError("Smoke test produced the wrong CSV columns")
+
+    count = 0
+    max_residual = 0.0
+    for row in reader:
+        count += 1
+        if (None in row or any(value is None for value in row.values())
+                or row["configuration_id"] != config_id
+                or row["generating_model"] != config["generating_model"]
+                or row["n"] != str(config["n"])
+                or row["inference_graph_space"] != "simple"
+                or row["chain_number"] != str(chain_number)
+                or row["chain_seed"] != str(seed)
+                or row["dataset_seed"] != str(config["dataset_seed"])
+                or row["iteration"] != str(50 + count)):
+            raise ValueError(f"Invalid smoke-test CSV row {count}")
+
+        serialized_edges = tuple(tuple(edge) for edge in json.loads(row["graph_edges_zero_based"]))
+        graph = Graph(p, frozenset(serialized_edges))
+        if (serialized_edges != graph.ordered_edges or not graph.is_simple
+                or int(row["k"]) != graph.k):
+            raise ValueError(f"Invalid graph in smoke-test row {count}")
+        indicators = [int(row[f"edge_{i}_{j}"]) for i, j in edges]
+        bitmask = sum(bit << index for index, bit in enumerate(indicators))
+        if (indicators != [int(edge in graph.edges) for edge in edges]
+                or int(row["graph_bitmask"]) != bitmask):
+            raise ValueError(f"Graph columns disagree in smoke-test row {count}")
+
+        coefficients = {}
+        for i, j in edges:
+            value = row[f"b_{i}_{j}"]
+            if (i, j) in graph.edges:
+                coefficients[i, j] = float(value)
+            elif value != "":
+                raise ValueError(f"Absent edge has a coefficient in smoke-test row {count}")
+        state = State.from_coefficients(
+            graph,
+            np.array([float(row[f"mu_{i}"]) for i in range(p)]),
+            np.array([float(row[f"r_{i}"]) for i in range(p - 1)]),
+            float(row["eta"]), coefficients,
+        )
+        state.validate_for_model(p, "simple")
+        calculation = calculations.drift(state)
+        stored_m = np.array([float(row[f"M_{i}_{j}"])
+                             for i in range(p) for j in range(p)]).reshape(p, p)
+        stored_sigma = np.array([float(row[f"Sigma_{i}_{j}"])
+                                 for i in range(p) for j in range(p)]).reshape(p, p)
+        np.testing.assert_allclose(stored_m, calculation.M, rtol=1e-12, atol=1e-12)
+        np.testing.assert_allclose(stored_sigma, calculation.covariance,
+                                   rtol=1e-12, atol=1e-12)
+        for name, expected in (
+            ("phi_H", calculation.spectral_abscissa),
+            ("stability_shift", calculation.spectral_abscissa + state.eta),
+            ("phi_M", -state.eta),
+            ("relative_lyapunov_residual", calculation.relative_lyapunov_residual),
+            ("log_likelihood", calculations.log_likelihood(state)),
+        ):
+            if not np.isclose(float(row[name]), expected, rtol=1e-12, atol=1e-12):
+                raise ValueError(f"{name} disagrees in smoke-test row {count}")
+        if (np.linalg.eigvals(stored_m).real.max() >= 0
+                or not np.isclose(np.linalg.eigvals(stored_m).real.max(),
+                                  -state.eta, rtol=1e-10, atol=1e-10)
+                or not np.allclose(stored_sigma, stored_sigma.T, rtol=0, atol=1e-10)
+                or np.linalg.eigvalsh(stored_sigma).min() <= 0):
+            raise ValueError(f"Unstable drift or invalid covariance in smoke-test row {count}")
+        lyapunov_residual = np.linalg.norm(
+            stored_m @ stored_sigma + stored_sigma @ stored_m.T + 2 * np.eye(p),
+            ord="fro",
+        )
+        max_residual = max(max_residual, lyapunov_residual)
+        if lyapunov_residual > 1e-8:
+            raise ValueError(f"Lyapunov equation fails in smoke-test row {count}")
+    if count != 50:
+        raise ValueError(f"Smoke test recorded {count} rows; expected 50")
+    return max_residual
 
 
 def main():
@@ -377,45 +440,55 @@ def main():
         observations = generate_datasets(models, datasets, mean,
                                          {config["generating_model"]})
         data = observations[config["generating_model"]][:config["n"]]
-        partial = SMOKE_PATH.with_name(SMOKE_PATH.name + ".partial")
+        output = io.StringIO(newline="")
         count = run_chain(task, data, prior, proposal, move_order, 100, 50,
-                          partial, fieldnames, edges)
-        os.replace(partial, SMOKE_PATH)
-        print(f"Smoke test: {task[0]} chain 1, seed {task[3]}, {count} rows, "
-              f"{perf_counter() - start_time:.1f}s; wrote {SMOKE_PATH}", flush=True)
+                          output, fieldnames, edges)
+        max_residual = verify_smoke_csv(output.getvalue(), task, data, fieldnames, edges)
+        print(f"Smoke test passed: {task[0]}, chain 1, seed {task[3]}, "
+              f"dataset seed {config['dataset_seed']}; {count} rows (iterations 51–100), "
+              f"{len(fieldnames)} columns; all states reconstructed, simple, stable, "
+              f"and positive definite; maximum Lyapunov residual {max_residual:.2e}; "
+              f"{perf_counter() - start_time:.1f}s. No files written.", flush=True)
         return
 
-    if RESULT_PATH.exists():
-        raise FileExistsError(f"Completed result already exists: {RESULT_PATH}")
     settings_hash = hashlib.sha256(SETTINGS_PATH.read_bytes()).hexdigest()
-    prepare_parts(settings_hash, fieldnames, run, args.resume)
+    prepare_results(settings_hash, fieldnames, run, args.resume)
     observations = generate_datasets(models, datasets, mean, set(datasets))
     completed = 0
+    saved = 0
     for task in tasks:
         config_id, config, chain_number, seed = task
         done = chain_file(task)
         if done.exists():
-            verify_completed_part(done, task, fieldnames,
-                                  run["iterations_per_chain"], run["burn_in"])
+            verify_completed_chain(done, task, fieldnames,
+                                   run["iterations_per_chain"], run["burn_in"])
             completed += 1
             print(f"[{completed}/{len(tasks)}] Resumed {config_id} chain {chain_number}", flush=True)
             continue
+        done.parent.mkdir(exist_ok=True)
         partial = done.with_name(done.name + ".partial")
         data = observations[config["generating_model"]][:config["n"]]
         chain_start = perf_counter()
         print(f"[{completed + 1}/{len(tasks)}] Running {config_id} chain {chain_number} "
               f"(seed {seed})", flush=True)
-        count = run_chain(task, data, prior, proposal, move_order,
-                          run["iterations_per_chain"], run["burn_in"],
-                          partial, fieldnames, edges)
+        with partial.open("w", newline="", encoding="utf-8") as output:
+            count = run_chain(task, data, prior, proposal, move_order,
+                              run["iterations_per_chain"], run["burn_in"],
+                              output, fieldnames, edges)
+            output.flush()
+            os.fsync(output.fileno())
+        if done.exists():
+            raise FileExistsError(f"Refusing to overwrite completed chain {done}")
         os.replace(partial, done)
         completed += 1
+        saved += 1
         print(f"[{completed}/{len(tasks)}] Completed {config_id} chain {chain_number}: "
-              f"{count} rows, {perf_counter() - chain_start:.1f}s; "
+              f"{count} retained iterations, {perf_counter() - chain_start:.1f}s; "
               f"elapsed {perf_counter() - start_time:.1f}s", flush=True)
-    consolidate(tasks, fieldnames)
-    print(f"Study complete: wrote {RESULT_PATH} in "
-          f"{perf_counter() - start_time:.1f}s", flush=True)
+        print(f"Saved: {done.relative_to(HERE)}", flush=True)
+    print(f"Study complete: {run['total_configurations']} configurations, "
+          f"{completed} chains, {completed * run['retained_per_chain']} retained draws "
+          f"({saved} new files) in {perf_counter() - start_time:.1f}s", flush=True)
 
 
 if __name__ == "__main__":
