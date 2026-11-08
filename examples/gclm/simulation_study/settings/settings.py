@@ -31,6 +31,7 @@ from examples.gclm.state import Graph, State
 
 P = 5
 GENERATING_SEED = 2026
+TRUE_TAU = 2.0
 SAMPLE_SIZES = (50, 200, 800)
 TRUE_EDGE_COUNTS = (2, 5, 8)
 GRAPH_SPACES = ("simple", "general")
@@ -52,10 +53,10 @@ EDGES = {
 }
 PRIOR = dict(
     lambda_p=5.0, s_r=1.0, mu_eta=0.0, s_eta=0.5,
-    tau=1.0, m_0=0.0, s_mu=5.0,
+    tau=2.0, m_0=0.0, s_mu=5.0,
 )
 PROPOSAL = dict(
-    sigma_r=1.25, sigma_eta=0.125, sigma_b=0.25, gamma=0.5,
+    sigma_r=1.25, sigma_eta=0.125, sigma_b=0.5, gamma=0.5,
     move_weights={
         "mean": 1.0, "contrast": 1.0, "margin": 1.0,
         "coefficient": 1.0, "reversal": 5.0,
@@ -126,7 +127,7 @@ def make_rows():
     rng = np.random.default_rng(GENERATING_SEED)
     r_star = rng.standard_normal(P - 1)
     full_graph = Graph(P, EDGES[8])
-    b_full = rng.standard_normal(full_graph.k)
+    b_full = TRUE_TAU * rng.standard_normal(full_graph.k)
     eta_star = float(np.exp(rng.normal(0.0, PRIOR["s_eta"])))
     coefficient_by_edge = dict(zip(full_graph.ordered_edges, b_full))
     Q = GCLMCalculations._contrast_basis(P)
@@ -166,6 +167,7 @@ def make_rows():
         total_chains=len(SAMPLE_SIZES) * len(TRUE_EDGE_COUNTS) * len(GRAPH_SPACES) * N_CHAINS,
     ))
     add("generating_parameters", "seed", GENERATING_SEED)
+    add("generating_parameters", "true_tau", TRUE_TAU)
     add("generating_parameters", "r_star", r_star.tolist())
     add("generating_parameters", "b_G8_ordered_edges", [list(edge) for edge in full_graph.ordered_edges])
     add("generating_parameters", "b_G8", b_full.tolist())
@@ -237,7 +239,7 @@ def main():
         parser.error(f"{OUTPUT} already exists; use --overwrite to regenerate it")
     rows = make_rows()
     with OUTPUT.open("w" if args.overwrite else "x", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
+        writer = csv.writer(file, lineterminator="\n")
         writer.writerow(("section", "key", "value_json"))
         for section, key, value in rows:
             writer.writerow((section, key, json.dumps(value, ensure_ascii=False,
